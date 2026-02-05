@@ -363,15 +363,15 @@ WidgetMetadata = {
             },
             {
               title: "Hoichoi",
-              value: "2139",
+              value: "121059",
             },
             {
               title: "Chorki",
-              value: "5119",
+              value: "246792",
             },
             {
               title: "Bongo",
-              value: "7035",
+              value: "161019",
             }
           ],
         },
@@ -694,14 +694,22 @@ async function categories(params) {
 }
 
 async function collections(params) {
-  const collectionId = params.collection_id;
-  const response = await Widget.tmdb.get(`collection/${collectionId}`, { params });
+  const id = params.collection_id;
+  let items = [];
 
-  if (!response || !response.parts) {
-    throw new Error("Failed to fetch collection data");
+  // Use keyword discovery for MCU (86311) and DCEU (8028) to get full lists
+  if (id === "86311" || id === "8028") {
+    const keywordId = id === "86311" ? "180547" : "229266";
+    const res = await Widget.tmdb.get("discover/movie", {
+      params: { ...params, with_keywords: keywordId }
+    });
+    items = res.results || [];
+  } else {
+    const res = await Widget.tmdb.get(`collection/${id}`, { params });
+    items = res.parts || [];
   }
 
-  return response.parts.map((item) => ({
+  const result = items.map((item) => ({
     id: item.id,
     type: "tmdb",
     title: item.title,
@@ -713,14 +721,27 @@ async function collections(params) {
     mediaType: "movie",
     genreTitle: genreTitleWith(item.genre_ids),
   }));
+
+  // Sort: New to Old
+  return result.sort((a, b) => {
+    const dateA = a.releaseDate ? new Date(a.releaseDate) : new Date(0);
+    const dateB = b.releaseDate ? new Date(b.releaseDate) : new Date(0);
+    return dateB - dateA;
+  });
 }
 
 async function networks(params) {
   const type = params.type || "tv";
+  const networkId = params.with_networks;
+
+  // Bengali streaming services are Companies, not Networks in TMDB
+  const bengaliCompanies = ["121059", "246792", "161019"];
+  const isBengali = bengaliCompanies.includes(networkId);
+
   if (type === "all") {
     const [movies, tv] = await Promise.all([
-      fetchData("discover/movie", { ...params, type: "movie" }, "movie"),
-      fetchData("discover/tv", { ...params, type: "tv" }, "tv"),
+      networks({ ...params, type: "movie" }),
+      networks({ ...params, type: "tv" }),
     ]);
 
     const result = [];
@@ -732,8 +753,15 @@ async function networks(params) {
   }
 
   const api = `discover/${type}`;
-  delete params.type;
-  return await fetchData(api, params, type);
+  const fetchParams = { ...params };
+  delete fetchParams.type;
+
+  if (isBengali) {
+    delete fetchParams.with_networks;
+    fetchParams.with_companies = networkId;
+  }
+
+  return await fetchData(api, fetchParams, type);
 }
 
 async function companies(params) {
