@@ -328,7 +328,7 @@ WidgetMetadata = {
       ],
     },
     {
-      id: "comp companies",
+      id: "companies",
       title: "Production Companies",
       functionName: "companies",
       params: [
@@ -366,8 +366,8 @@ WidgetMetadata = {
               value: "25",
             },
             {
-              title: "Marvel Studios",
-              value: "420",
+              title: "Lionsgate",
+              value: "1632",
             },
           ]
         },
