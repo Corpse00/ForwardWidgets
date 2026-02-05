@@ -496,8 +496,8 @@ WidgetMetadata = {
           title: "Collection",
           type: "enumeration",
           enumOptions: [
-            { title: "Marvel", value: "86311" },
-            { title: "Detective Comics", value: "8028" },
+            { title: "MCU", value: "86311" },
+            { title: "DCEU", value: "8028" },
             { title: "Star Wars", value: "10" },
             { title: "James Bond", value: "645" },
             { title: "Lord of the Rings", value: "119" },
