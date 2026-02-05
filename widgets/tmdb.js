@@ -19,6 +19,10 @@ WidgetMetadata = {
           type: "enumeration",
           enumOptions: [
             {
+              title: "All",
+              value: "all",
+            },
+            {
               title: "Movies",
               value: "movie",
             },
@@ -37,7 +41,7 @@ WidgetMetadata = {
           name: "language",
           title: "Language",
           type: "language",
-          value: "zh-CN",
+          value: "en-US",
         },
       ],
     },
@@ -63,10 +67,29 @@ WidgetMetadata = {
           ],
         },
         {
+          name: "type",
+          title: "Type",
+          type: "enumeration",
+          enumOptions: [
+            {
+              title: "All",
+              value: "all",
+            },
+            {
+              title: "Movies",
+              value: "movie",
+            },
+            {
+              title: "TV Shows",
+              value: "tv",
+            },
+          ],
+        },
+        {
           name: "language",
           title: "Language",
           type: "language",
-          value: "zh-CN",
+          value: "en-US",
         },
       ],
     },
@@ -82,6 +105,10 @@ WidgetMetadata = {
           type: "enumeration",
           enumOptions: [
             {
+              title: "All",
+              value: "all",
+            },
+            {
               title: "Movies",
               value: "movie",
             },
@@ -95,7 +122,7 @@ WidgetMetadata = {
           name: "language",
           title: "Language",
           type: "language",
-          value: "zh-CN",
+          value: "en-US",
         },
         {
           name: "page",
@@ -116,6 +143,10 @@ WidgetMetadata = {
           type: "enumeration",
           enumOptions: [
             {
+              title: "All",
+              value: "all",
+            },
+            {
               title: "Movies",
               value: "movie",
             },
@@ -134,7 +165,7 @@ WidgetMetadata = {
           name: "language",
           title: "Language",
           type: "language",
-          value: "zh-CN",
+          value: "en-US",
         },
       ],
     },
@@ -213,6 +244,10 @@ WidgetMetadata = {
           },
           enumOptions: [
             {
+              title: "All",
+              value: "all",
+            },
+            {
               title: "Movies",
               value: "movie",
             },
@@ -230,11 +265,11 @@ WidgetMetadata = {
             paramName: "with_genres",
             value: ["10764"],
           },
-          value: "CN",
+          value: "US",
           placeholders: [
             {
-              title: "China",
-              value: "CN",
+              title: "India",
+              value: "IN",
             },
             {
               title: "USA",
@@ -263,7 +298,7 @@ WidgetMetadata = {
           name: "language",
           title: "Language",
           type: "language",
-          value: "zh-CN",
+          value: "en-US",
         },
       ],
     },
@@ -273,6 +308,26 @@ WidgetMetadata = {
       functionName: "networks",
       cacheDuration: 43200,
       params: [
+        {
+          name: "type",
+          title: "Type",
+          type: "enumeration",
+          value: "tv",
+          enumOptions: [
+            {
+              title: "All",
+              value: "all",
+            },
+            {
+              title: "Movies",
+              value: "movie",
+            },
+            {
+              title: "TV Shows",
+              value: "tv",
+            },
+          ],
+        },
         {
           name: "with_networks",
           title: "Network",
@@ -305,6 +360,18 @@ WidgetMetadata = {
             {
               title: "Paramount+",
               value: "4330",
+            },
+            {
+              title: "Hoichoi",
+              value: "2139",
+            },
+            {
+              title: "Chorki",
+              value: "5119",
+            },
+            {
+              title: "Bongo",
+              value: "7035",
             }
           ],
         },
@@ -317,7 +384,7 @@ WidgetMetadata = {
           name: "language",
           title: "Language",
           type: "language",
-          value: "zh-CN",
+          value: "en-US",
         },
       ],
     },
@@ -327,6 +394,26 @@ WidgetMetadata = {
       functionName: "companies",
       cacheDuration: 43200,
       params: [
+        {
+          name: "type",
+          title: "Type",
+          type: "enumeration",
+          value: "movie",
+          enumOptions: [
+            {
+              title: "All",
+              value: "all",
+            },
+            {
+              title: "Movies",
+              value: "movie",
+            },
+            {
+              title: "TV Shows",
+              value: "tv",
+            },
+          ],
+        },
         {
           name: "with_companies",
           title: "Company",
@@ -361,8 +448,8 @@ WidgetMetadata = {
               value: "25",
             },
             {
-              title: "Marvel",
-              value: "420",
+              title: "Lionsgate",
+              value: "1632",
             },
           ]
         },
@@ -375,7 +462,7 @@ WidgetMetadata = {
           name: "language",
           title: "Language",
           type: "language",
-          value: "zh-CN",
+          value: "en-US",
         },
       ]
     },
@@ -397,6 +484,34 @@ WidgetMetadata = {
             }
           ],
         }
+      ],
+    },
+    {
+      id: "collections",
+      title: "Collections",
+      functionName: "collections",
+      params: [
+        {
+          name: "collection_id",
+          title: "Collection",
+          type: "enumeration",
+          enumOptions: [
+            { title: "Marvel", value: "86311" },
+            { title: "Detective Comics", value: "8028" },
+            { title: "Star Wars", value: "10" },
+            { title: "James Bond", value: "645" },
+            { title: "Lord of the Rings", value: "119" },
+            { title: "Harry Potter", value: "1241" },
+            { title: "John Wick", value: "403374" },
+            { title: "Mission Impossible", value: "87359" },
+          ],
+        },
+        {
+          name: "language",
+          title: "Language",
+          type: "language",
+          value: "en-US",
+        },
       ],
     }
   ],
@@ -463,6 +578,20 @@ async function fetchData(api, params, forceMediaType) {
 
 async function nowPlaying(params) {
   const type = params.type;
+  if (type === "all") {
+    const [movies, tv] = await Promise.all([
+      fetchData("movie/now_playing", { ...params, type: "movie" }, "movie"),
+      fetchData("tv/on_the_air", { ...params, type: "tv" }, "tv"),
+    ]);
+
+    const result = [];
+    for (let i = 0; i < Math.max(movies.length, tv.length); i++) {
+      if (movies[i]) result.push(movies[i]);
+      if (tv[i]) result.push(tv[i]);
+    }
+    return result;
+  }
+
   let api = "tv/on_the_air";
   if (type === "movie") {
     api = "movie/now_playing";
@@ -471,14 +600,30 @@ async function nowPlaying(params) {
 }
 
 async function trending(params) {
-  const timeWindow = params.time_window;
-  const api = `trending/all/${timeWindow}`;
+  const type = params.type || "all";
+  const timeWindow = params.time_window || "day";
+  const api = `trending/${type}/${timeWindow}`;
+  delete params.type;
   delete params.time_window;
-  return await fetchData(api, params);
+  return await fetchData(api, params, type === "all" ? null : type);
 }
 
 async function popular(params) {
   const type = params.type;
+  if (type === "all") {
+    const [movies, tv] = await Promise.all([
+      fetchData("movie/popular", { ...params, type: "movie" }, "movie"),
+      fetchData("tv/popular", { ...params, type: "tv" }, "tv"),
+    ]);
+
+    const result = [];
+    for (let i = 0; i < Math.max(movies.length, tv.length); i++) {
+      if (movies[i]) result.push(movies[i]);
+      if (tv[i]) result.push(tv[i]);
+    }
+    return result;
+  }
+
   let api = `movie/popular`;
   if (type === "tv") {
     api = `tv/popular`;
@@ -489,6 +634,20 @@ async function popular(params) {
 
 async function topRated(params) {
   const type = params.type;
+  if (type === "all") {
+    const [movies, tv] = await Promise.all([
+      fetchData("movie/top_rated", { ...params, type: "movie" }, "movie"),
+      fetchData("tv/top_rated", { ...params, type: "tv" }, "tv"),
+    ]);
+
+    const result = [];
+    for (let i = 0; i < Math.max(movies.length, tv.length); i++) {
+      if (movies[i]) result.push(movies[i]);
+      if (tv[i]) result.push(tv[i]);
+    }
+    return result;
+  }
+
   let api = `movie/top_rated`;
   if (type === "tv") {
     api = `tv/top_rated`;
@@ -499,34 +658,103 @@ async function topRated(params) {
 
 async function categories(params) {
   let genreId = params.with_genres;
-  let type = params.type;
+  const type = params.type;
+
+  if (type === "all") {
+    const [movies, tv] = await Promise.all([
+      categories({ ...params, type: "movie" }),
+      categories({ ...params, type: "tv" }),
+    ]);
+
+    const result = [];
+    for (let i = 0; i < Math.max(movies.length, tv.length); i++) {
+      if (movies[i]) result.push(movies[i]);
+      if (tv[i]) result.push(tv[i]);
+    }
+    return result;
+  }
+
   const onlyMovieGenreIds = ["28", "53"]; // Action, Thriller
   const onlyTvGenreIds = ["10762", "10764", "10766"]; // Kids, Reality, Soap
-  if (genreId == "878" && type == "tv") {
+  let fetchType = type;
+
+  if (genreId == "878" && fetchType == "tv") {
     genreId = "10765";
   }
   if (onlyMovieGenreIds.includes(genreId)) {
-    type = "movie";
+    fetchType = "movie";
   }
   if (onlyTvGenreIds.includes(genreId)) {
-    type = "tv";
+    fetchType = "tv";
   }
+  const api = `discover/${fetchType}`;
+  const fetchParams = { ...params, with_genres: genreId };
+  delete fetchParams.type;
+  return await fetchData(api, fetchParams, fetchType);
+}
+
+async function collections(params) {
+  const collectionId = params.collection_id;
+  const response = await Widget.tmdb.get(`collection/${collectionId}`, { params });
+
+  if (!response || !response.parts) {
+    throw new Error("Failed to fetch collection data");
+  }
+
+  return response.parts.map((item) => ({
+    id: item.id,
+    type: "tmdb",
+    title: item.title,
+    description: item.overview,
+    releaseDate: item.release_date,
+    backdropPath: item.backdrop_path,
+    posterPath: item.poster_path,
+    rating: item.vote_average,
+    mediaType: "movie",
+    genreTitle: genreTitleWith(item.genre_ids),
+  }));
+}
+
+async function networks(params) {
+  const type = params.type || "tv";
+  if (type === "all") {
+    const [movies, tv] = await Promise.all([
+      fetchData("discover/movie", { ...params, type: "movie" }, "movie"),
+      fetchData("discover/tv", { ...params, type: "tv" }, "tv"),
+    ]);
+
+    const result = [];
+    for (let i = 0; i < Math.max(movies.length, tv.length); i++) {
+      if (movies[i]) result.push(movies[i]);
+      if (tv[i]) result.push(tv[i]);
+    }
+    return result;
+  }
+
   const api = `discover/${type}`;
-  params.with_genres = genreId;
   delete params.type;
   return await fetchData(api, params, type);
 }
 
-async function networks(params) {
-  let api = `discover/tv`;
-  delete params.type;
-  return await fetchData(api, params);
-}
-
 async function companies(params) {
-  let api = `discover/movie`;
+  const type = params.type || "movie";
+  if (type === "all") {
+    const [movies, tv] = await Promise.all([
+      fetchData("discover/movie", { ...params, type: "movie" }, "movie"),
+      fetchData("discover/tv", { ...params, type: "tv" }, "tv"),
+    ]);
+
+    const result = [];
+    for (let i = 0; i < Math.max(movies.length, tv.length); i++) {
+      if (movies[i]) result.push(movies[i]);
+      if (tv[i]) result.push(tv[i]);
+    }
+    return result;
+  }
+
+  const api = `discover/${type}`;
   delete params.type;
-  return await fetchData(api, params, "movie");
+  return await fetchData(api, params, type);
 }
 
 async function list(params = {}) {
