@@ -1,40 +1,40 @@
 WidgetMetadata = {
-  id: "forward.tmdb",
+  id: "vokdn.tmdb",
   title: "TMDB",
-  version: "1.0.3",
+  version: "1.0.0",
   requiredVersion: "0.0.1",
-  description: "获取 TMDB 的榜单数据",
-  author: "Forward",
+  description: "Get TMDB chart data",
+  author: "vokdn",
   site: "https://github.com/InchStudio/ForwardWidgets",
   modules: [
     {
       id: "nowPlaying",
-      title: "正在热映",
+      title: "Now Playing",
       functionName: "nowPlaying",
       params: [
         {
           name: "type",
-          title: "接口",
+          title: "Type",
           type: "enumeration",
           enumOptions: [
             {
-              title: "电影",
+              title: "Movies",
               value: "movie",
             },
             {
-              title: "剧集",
+              title: "TV Shows",
               value: "tv",
             },
           ],
         },
         {
           name: "page",
-          title: "页码",
+          title: "Page",
           type: "page"
         },
         {
           name: "language",
-          title: "语言",
+          title: "Language",
           type: "language",
           value: "zh-CN",
         },
@@ -42,27 +42,27 @@ WidgetMetadata = {
     },
     {
       id: "trending",
-      title: "趋势",
+      title: "Trending",
       functionName: "trending",
       params: [
         {
           name: "time_window",
-          title: "时间窗口",
+          title: "Time Window",
           type: "enumeration",
           enumOptions: [
             {
-              title: "今日",
+              title: "Today",
               value: "day",
             },
             {
-              title: "本周",
+              title: "This Week",
               value: "week",
             },
           ],
         },
         {
           name: "language",
-          title: "语言",
+          title: "Language",
           type: "language",
           value: "zh-CN",
         },
@@ -70,65 +70,65 @@ WidgetMetadata = {
     },
     {
       id: "popular",
-      title: "备受欢迎",
+      title: "Popular",
       functionName: "popular",
       params: [
         {
           name: "type",
-          title: "类型",
+          title: "Type",
           type: "enumeration",
           enumOptions: [
             {
-              title: "电影",
+              title: "Movies",
               value: "movie",
             },
             {
-              title: "剧集",
+              title: "TV Shows",
               value: "tv",
             },
           ],
         },
         {
           name: "language",
-          title: "语言",
+          title: "Language",
           type: "language",
           value: "zh-CN",
         },
         {
           name: "page",
-          title: "页码",
+          title: "Page",
           type: "page",
         },
       ],
     },
     {
       id: "topRated",
-      title: "高分内容",
+      title: "Top Rated",
       functionName: "topRated",
       params: [
         {
           name: "type",
-          title: "接口",
+          title: "Type",
           type: "enumeration",
           enumOptions: [
             {
-              title: "电影",
+              title: "Movies",
               value: "movie",
             },
             {
-              title: "剧集",
+              title: "TV Shows",
               value: "tv",
             },
           ],
         },
         {
           name: "page",
-          title: "页码",
+          title: "Page",
           type: "page"
         },
         {
           name: "language",
-          title: "语言",
+          title: "Language",
           type: "language",
           value: "zh-CN",
         },
@@ -136,71 +136,71 @@ WidgetMetadata = {
     },
     {
       id: "categories",
-      title: "分类",
+      title: "Categories",
       functionName: "categories",
       params: [
         {
           name: "with_genres",
-          title: "分类",
+          title: "Category",
           type: "enumeration",
           enumOptions: [
             {
-              title: "合家欢",
+              title: "Family",
               value: "10751",
             },
             {
-              title: "动画",
+              title: "Animation",
               value: "16",
             },
             {
-              title: "喜剧",
+              title: "Comedy",
               value: "35",
             },
             {
-              title: "犯罪",
+              title: "Crime",
               value: "80",
             },
             {
-              title: "纪录",
+              title: "Documentary",
               value: "99",
             },
             {
-              title: "剧情",
+              title: "Drama",
               value: "18",
             },
             {
-              title: "悬疑",
+              title: "Mystery",
               value: "9648",
             },
             {
-              title: "西部",
+              title: "Western",
               value: "37",
             },
             {
-              title: "儿童",
+              title: "Kids",
               value: "10762",
             },
             {
-              title: "科幻",
+              title: "Sci-Fi",
               value: "878",
             },
             {
-              title: "动作",
+              title: "Action",
               value: "28",
             },
             {
-              title: "惊悚",
+              title: "Thriller",
               value: "53",
             },
             {
-              title: "真人秀",
+              title: "Reality",
               value: "10764",
             },
           ],
         },
         {
           name: "type",
-          title: "类型",
+          title: "Type",
           type: "enumeration",
           belongTo: {
             paramName: "with_genres",
@@ -208,18 +208,18 @@ WidgetMetadata = {
           },
           enumOptions: [
             {
-              title: "电影",
+              title: "Movies",
               value: "movie",
             },
             {
-              title: "剧集",
+              title: "TV Shows",
               value: "tv",
             },
           ],
         },
         {
           name: "with_origin_country",
-          title: "国家",
+          title: "Country",
           type: "input",
           belongTo: {
             paramName: "with_genres",
@@ -228,35 +228,35 @@ WidgetMetadata = {
           value: "CN",
           placeholders: [
             {
-              title: "中国",
+              title: "China",
               value: "CN",
             },
             {
-              title: "美国",
+              title: "USA",
               value: "US",
             },
             {
-              title: "英国",
+              title: "UK",
               value: "GB",
             },
             {
-              title: "日本",
+              title: "Japan",
               value: "JP",
             },
             {
-              title: "韩国",
+              title: "Korea",
               value: "KR",
             },
           ],
         },
         {
           name: "page",
-          title: "页码",
+          title: "Page",
           type: "page"
         },
         {
           name: "language",
-          title: "语言",
+          title: "Language",
           type: "language",
           value: "zh-CN",
         },
@@ -264,12 +264,12 @@ WidgetMetadata = {
     },
     {
       id: "networks",
-      title: "播出平台",
+      title: "Networks",
       functionName: "networks",
       params: [
         {
           name: "with_networks",
-          title: "播出平台",
+          title: "Network",
           type: "input",
           placeholders: [
             {
@@ -295,7 +295,7 @@ WidgetMetadata = {
             {
               title: "Prime Video",
               value: "1024",
-            }, 
+            },
             {
               title: "Paramount+",
               value: "4330",
@@ -304,12 +304,12 @@ WidgetMetadata = {
         },
         {
           name: "page",
-          title: "页码",
+          title: "Page",
           type: "page"
         },
         {
           name: "language",
-          title: "语言",
+          title: "Language",
           type: "language",
           value: "zh-CN",
         },
@@ -317,40 +317,40 @@ WidgetMetadata = {
     },
     {
       id: "companies",
-      title: "出品公司",
+      title: "Production Companies",
       functionName: "companies",
       params: [
         {
           name: "with_companies",
-          title: "出品公司",
+          title: "Company",
           type: "enumeration",
           enumOptions: [
             {
-              title: "迪士尼",
+              title: "Disney",
               value: "2",
             },
             {
-              title: "华纳兄弟",
+              title: "Warner Bros.",
               value: "174",
             },
             {
-              title: "哥伦比亚影业",
+              title: "Columbia Pictures",
               value: "5",
             },
             {
-              title: "索尼影业",
+              title: "Sony Pictures",
               value: "34",
             },
             {
-              title: "环球影业",
+              title: "Universal Pictures",
               value: "33",
             },
             {
-              title: "派拉蒙影业",
+              title: "Paramount Pictures",
               value: "4",
             },
             {
-              title: "二十世纪影业",
+              title: "20th Century Studios",
               value: "25",
             },
             {
@@ -361,12 +361,12 @@ WidgetMetadata = {
         },
         {
           name: "page",
-          title: "页码",
+          title: "Page",
           type: "page"
         },
         {
           name: "language",
-          title: "语言",
+          title: "Language",
           type: "language",
           value: "zh-CN",
         },
@@ -374,17 +374,17 @@ WidgetMetadata = {
     },
     {
       id: "list",
-      title: "片单",
+      title: "Lists",
       functionName: "list",
       params: [
         {
           name: "url",
-          title: "列表地址",
+          title: "List URL",
           type: "input",
-          description: "TMDB 片单地址",
+          description: "TMDB List URL",
           placeholders: [
             {
-              title: "奥斯卡金像奖",
+              title: "Oscar Best Picture",
               value: "https://www.themoviedb.org/list/8512095-2025-oscar-nominations-for-best-picture-97th-academy-awards",
             }
           ],
@@ -394,19 +394,19 @@ WidgetMetadata = {
   ],
 };
 
-// 基础获取TMDB数据方法
+// Base method to fetch TMDB data
 async function fetchData(api, params, forceMediaType) {
   try {
     const response = await Widget.tmdb.get(api, { params: params });
 
     if (!response) {
-      throw new Error("获取数据失败");
+      throw new Error("Failed to fetch data");
     }
 
     console.log(response);
     let data = response.results;
-    
-    // 如果没有 forceMediaType，先过滤只保留 movie 和 tv 的数据
+
+    // If no forceMediaType, filter to only keep movie and tv data
     if (!forceMediaType) {
       data = data.filter((item) => {
         let mediaType = item.media_type;
@@ -420,7 +420,7 @@ async function fetchData(api, params, forceMediaType) {
         return mediaType === "movie" || mediaType === "tv";
       });
     }
-    
+
     const result = data.map((item) => {
       let mediaType = item.media_type;
       if (forceMediaType) {
@@ -431,7 +431,7 @@ async function fetchData(api, params, forceMediaType) {
         } else {
           mediaType = "tv";
         }
-      } 
+      }
       return {
         id: item.id,
         type: "tmdb",
@@ -445,10 +445,10 @@ async function fetchData(api, params, forceMediaType) {
         genreTitle: genreTitleWith(item.genre_ids),
       };
     });
-    
+
     return result;
   } catch (error) {
-    console.error("调用 TMDB API 失败:", error);
+    console.error("Failed to call TMDB API:", error);
     throw error;
   }
 }
@@ -492,8 +492,8 @@ async function topRated(params) {
 async function categories(params) {
   let genreId = params.with_genres;
   let type = params.type;
-  const onlyMovieGenreIds = ["28", "53"];//动作，惊悚
-  const onlyTvGenreIds = ["10762", "10764", "10766"];//儿童，真人秀，肥皂剧
+  const onlyMovieGenreIds = ["28", "53"]; // Action, Thriller
+  const onlyTvGenreIds = ["10762", "10764", "10766"]; // Kids, Reality, Soap
   if (genreId == "878" && type == "tv") {
     genreId = "10765";
   }
@@ -533,8 +533,8 @@ async function list(params = {}) {
     }
   }
 
-  console.log("请求片单页面:", url);
-  // 发送请求获取片单页面
+  console.log("Requesting list page:", url);
+  // Send request to get list page
   const response = await Widget.http.get(url, {
     headers: {
       Referer: `https://www.themoviedb.org/`,
@@ -544,20 +544,20 @@ async function list(params = {}) {
   });
 
   if (!response || !response.data) {
-    throw new Error("获取片单数据失败");
+    throw new Error("Failed to get list data");
   }
 
 
-  console.log("片单页面数据长度:", response.data.length);
-  console.log("开始解析");
+  console.log("List page data length:", response.data.length);
+  console.log("Starting parsing");
 
-  // 解析 HTML 得到文档 ID
+  // Parse HTML to get document ID
   const $ = Widget.html.load(response.data);
   if (!$ || $ === null) {
-    throw new Error("解析 HTML 失败");
+    throw new Error("Failed to parse HTML");
   }
 
-  //        // 获取所有视频项，得到元素ID数组
+  // Get all video items, get element ID array
   const coverElements = $(".block.aspect-poster");
 
   console.log("items:", coverElements);
@@ -585,41 +585,41 @@ function genreTitleWith(genre_ids) {
     return "";
   }
   const genreDict = [
-    {"id": 10759, "name": "动作冒险"},
-    {"id": 16, "name": "动画"},
-    {"id": 35, "name": "喜剧"},
-    {"id": 80, "name": "犯罪"},
-    {"id": 99, "name": "纪录"},
-    {"id": 18, "name": "剧情"},
-    {"id": 10751, "name": "家庭"},
-    {"id": 10762, "name": "儿童"},
-    {"id": 9648, "name": "悬疑"},
-    {"id": 10763, "name": "新闻"},
-    {"id": 10764, "name": "真人秀"},
-    {"id": 10765, "name": "Sci-Fi & Fantasy"},
-    {"id": 10766, "name": "肥皂剧"},
-    {"id": 10767, "name": "脱口秀"},
-    {"id": 10768, "name": "War & Politics"},
-    {"id": 37, "name": "西部"},
-    {"id": 28, "name": "动作"},
-    {"id": 12, "name": "冒险"},
-    {"id": 16, "name": "动画"},
-    {"id": 35, "name": "喜剧"},
-    {"id": 80, "name": "犯罪"},
-    {"id": 99, "name": "纪录"},
-    {"id": 18, "name": "剧情"},
-    {"id": 10751, "name": "家庭"},
-    {"id": 14, "name": "奇幻"},
-    {"id": 36, "name": "历史"},
-    {"id": 27, "name": "恐怖"},
-    {"id": 10402, "name": "音乐"},
-    {"id": 9648, "name": "悬疑"},
-    {"id": 10749, "name": "爱情"},
-    {"id": 878, "name": "科幻"},
-    {"id": 10770, "name": "电视电影"},
-    {"id": 53, "name": "惊悚"},
-    {"id": 10752, "name": "战争"},
-    {"id": 37, "name": "西部"},
+    { "id": 10759, "name": "Action & Adventure" },
+    { "id": 16, "name": "Animation" },
+    { "id": 35, "name": "Comedy" },
+    { "id": 80, "name": "Crime" },
+    { "id": 99, "name": "Documentary" },
+    { "id": 18, "name": "Drama" },
+    { "id": 10751, "name": "Family" },
+    { "id": 10762, "name": "Kids" },
+    { "id": 9648, "name": "Mystery" },
+    { "id": 10763, "name": "News" },
+    { "id": 10764, "name": "Reality" },
+    { "id": 10765, "name": "Sci-Fi & Fantasy" },
+    { "id": 10766, "name": "Soap" },
+    { "id": 10767, "name": "Talk" },
+    { "id": 10768, "name": "War & Politics" },
+    { "id": 37, "name": "Western" },
+    { "id": 28, "name": "Action" },
+    { "id": 12, "name": "Adventure" },
+    { "id": 16, "name": "Animation" },
+    { "id": 35, "name": "Comedy" },
+    { "id": 80, "name": "Crime" },
+    { "id": 99, "name": "Documentary" },
+    { "id": 18, "name": "Drama" },
+    { "id": 10751, "name": "Family" },
+    { "id": 14, "name": "Fantasy" },
+    { "id": 36, "name": "History" },
+    { "id": 27, "name": "Horror" },
+    { "id": 10402, "name": "Music" },
+    { "id": 9648, "name": "Mystery" },
+    { "id": 10749, "name": "Romance" },
+    { "id": 878, "name": "Sci-Fi" },
+    { "id": 10770, "name": "TV Movie" },
+    { "id": 53, "name": "Thriller" },
+    { "id": 10752, "name": "War" },
+    { "id": 37, "name": "Western" },
   ]
   if (genre_ids.length > 2) {
     genre_ids = genre_ids.slice(0, 2);

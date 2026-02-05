@@ -7,58 +7,57 @@
 
 <div align=center>
     
-[**简体中文 🇨🇳**](README.md) / [**English 🇺🇸**](README_EN.md)
 
 </div>
 
 # ForwardWidget
 
-ForwardWidget 是一个用于构建模块的 JS 组件，提供了丰富的网页相关功能和数据模型。
+ForwardWidget is a JS component for building modules that provides rich web-related functionality and data models.
 
-## 开发自定义 Widget
+## Developing Custom Widgets
 
-ForwardWidget 支持通过 JavaScript 脚本扩展功能。每个 Widget 都是一个独立的 JavaScript 文件，需要遵循特定的结构和规范。
+ForwardWidget supports extending functionality through JavaScript scripts. Each Widget is an independent JavaScript file that must follow specific structure and specifications.
 
-### Widget 元数据配置
+### Widget Metadata Configuration
 
-每个 Widget 脚本必须以 `WidgetMetadata` 对象开始，定义 Widget 的基本信息和功能模块：
+Each Widget script must start with a `WidgetMetadata` object that defines the basic information and functional modules:
 
 ```javascript
 var WidgetMetadata = {
-    id: "unique_id",                        // Widget 唯一标识符
-    title: "Widget Title",                  // Widget 显示标题
-    description: "Description",             // Widget 描述
-    author: "Author Name",                  // 作者
-    site: "https://example.com",            // 网站地址
-    version: "1.0.0",                       // Widget 版本
-    requiredVersion: "0.0.1",               // 所需 ForwardWidget 版本
-    detailCacheDuration: 60,                // 详情数据缓存时长，单位：秒，默认 60 秒
-    modules: [                              // 功能模块列表
+    id: "unique_id",                            // Widget unique identifier
+    title: "Widget Title",                      // Widget display title
+    description: "Description",                 // Widget description
+    author: "Author Name",                      // Author
+    site: "https://example.com",                // Website URL
+    version: "1.0.0",                           // Widget version
+    requiredVersion: "0.0.1",                   // Required ForwardWidget version
+    detailCacheDuration: 60,                    // Duration of detail data cache, unit: seconds. default: 60.
+    modules: [                                  // List of functional modules
         {
-            title: "Module Title",          // 模块标题
-            description: "Description",     // 模块描述
-            requiresWebView: false,         // 是否需要 WebView
-            functionName: "functionName",   // 处理函数名
-            sectionMode: false,             // 是否支持分段模式
-            cacheDuration: 3600,              //缓存时长，单位：秒，默认 3600 秒
-            params: [                       // 参数配置
+            title: "Module Title",              // Module title
+            description: "Description",         // Module description
+            requiresWebView: false,             // Whether WebView is required
+            functionName: "functionName",       // Handler function name
+            sectionMode: false,                 // Whether section mode is supported
+            cacheDuration: 3600,                  // module api cache duration, unit: seconds. default: 3600.
+            params: [                           // Parameter configuration
                 {
-                    name: "paramName",      // 参数名
-                    title: "Param Title",   // 参数显示标题
-                    type: "input",          // 参数类型 input | constant | enumeration | count | page | offset
-                    description: "Description", // 参数描述
-                    value: "defaultValue",  // 默认值
-                    belongTo: {             // 当符合该条件时才会触发该参数
-                        paramName: "param name" // 所属参数的子参数
-                        value: ["value"]    // 所属参数包含的值
+                    name: "paramName",          // Parameter name
+                    title: "Param Title",       // Parameter display title
+                    type: "input",              // Parameter type input | constant | enumeration | count | page | offset
+                    description: "Description", // Parameter description
+                    value: "defaultValue",      // Default value
+                    belongTo: {                 // Triggered only when this condition is met
+                        paramName: "param name" // Sub-parameter of the parent parameter
+                        value: ["value"]        // Values contained in the parent parameter
                     }
-                    placeholders: [         // 占位符选项
+                    placeholders: [             // Placeholder options
                         {
                             title: "Option Title",
                             value: "optionValue"
                         }
                     ],
-                    enumOptions: [         // 枚举选项
+                    enumOptions: [              // Enumeration options
                         {
                             title: "Option Title",
                             value: "optionValue"
@@ -68,81 +67,79 @@ var WidgetMetadata = {
             ]
         }
     ],
-    search: {                   // 搜索功能配置（可选）
+    search: {                   // Search function configuration (optional)
         title: "Search",
           functionName: "search",
-        params: [/* 搜索参数配置 */]
+        params: [/* Search parameter configuration */]
     }
 };
 ```
 
-### 参数类型说明
+### Parameter Type Description
 
-Widget 支持以下参数类型：
+Widget supports the following parameter types:
 
-- `input`: 文本输入框
-- `count`: 数字计数器
-- `constant`: 常量值
-- `enumeration`: 枚举选择器
-- `page`: 页码选择器
-- `offset`: 当前位置
+- `input`: Text input field
+- `count`: Number counter
+- `constant`: Constant value
+- `enumeration`: Enumeration selector
+- `page`: Page number selector
+- `offset`: Current Offset
 
-### 处理函数规范
+### Handler Function Specification
 
-每个模块都需要实现对应的处理函数，函数名与 `functionName` 一致。处理函数接收一个 `params` 对象作为参数，包含所有配置的参数值。
+Each module needs to implement a corresponding handler function with the same name as `functionName`. The handler function receives a `params` object as a parameter containing all configured parameter values.
 
 ```javascript
 async function functionName(params = {}) {
-  try {
-    // 1. 参数验证
-    if (!params.requiredParam) {
-      throw new Error("缺少必要参数");
+    try {
+        // 1. Parameter validation
+        if (!params.requiredParam) {
+            throw new Error("Missing required parameter");
+        }
+
+        // 2. Send request
+        const response = await Widget.http.get(url, {
+            headers: {
+                "User-Agent": "Mozilla/5.0 ...",
+                "Referer": "https://example.com"
+            }
+        });
+
+        // 3. Parse response
+        const docId = Widget.dom.parse(response.data);
+        const elements = Widget.dom.select(docId, "selector");
+
+        // 4. Return results
+        return elements.map(element => ({
+            id: "unique_id",
+            type: "type",
+            title: "title",
+            coverUrl: "url",
+            // ... other properties
+        }));
+    } catch (error) {
+        console.error("Processing failed:", error);
+        throw error;
     }
-
-    // 2. 发送请求
-    const response = await Widget.http.get(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 ...",
-        Referer: "https://example.com",
-      },
-    });
-
-    // 3. 解析响应
-    const docId = Widget.dom.parse(response.data);
-    const elements = Widget.dom.select(docId, "selector");
-
-    // 4. 返回结果
-    return elements.map((element) => ({
-      id: "unique_id",
-      type: "type",
-      title: "title",
-      coverUrl: "url",
-      // ... 其他属性
-    }));
-  } catch (error) {
-    console.error("处理失败:", error);
-    throw error;
-  }
 }
 ```
 
-### DOM 操作 API
+### DOM Operation API
 
-Widget 内置了 cheerio 进行 dom 解析。
+Widget has built-in cheerio for DOM parsing.
 
 ```javascript
-// 获得 cheerio 句柄
+// Get cheerio handle
 const $ = Widget.html.load(htmlContent);
 ```
 
-### HTTP 请求 API
+### HTTP Request API
 
-Widget 提供了 HTTP 请求 API：
+Widget provides HTTP request API:
 
 ```javascript
-
-// options 可以设置一些自定义的内容
-// 比如：
+// options example
 // {
 //   allow_redirects: false
 //   headers: {
@@ -159,94 +156,94 @@ const response = await Widget.http.get(url, options);
 // POST 请求
 const response = await Widget.http.post(url, body, options);
 
-let data = response.data;
+let data = response.data
 ```
 
-### 详情数据的 type 为 link 时，加载对应 link 的 API
+### Loading Detail Data When Type is "link"
 
 ```javascript
 async function loadDetail(link) {
-  // 需返回一个带有 videoUrl 的对象
+    // Must return an object containing videoUrl
 }
 ```
 
-### 返回数据格式
+### Return Data Format
 
-处理函数需要返回符合 ForwardWidget 数据模型的对象数组：
+Handler functions need to return an array of objects that conform to the ForwardWidget data model:
 
 ```javascript
-// 视频列表项
+// Video list item
 {
-    id: "unique_id",            // 根据不同类型的主要值，type 为 url 时，为对应 url，type 为 douban、imdb、tmdb 时，id 为对应 id 值。如果为 tmdb 的 id，需要由 type.id 组成，如：tv.123 movie.234。
-    type: "type",               // 类型标识 url, douban, imdb, tmdb
-    title: "title",             // 标题
-    posterPath: "url",          // 纵向封面图片地址
-    backdropPath: "url",        //横向封面地址
-    releaseDate: "date",        //发布时间
-    mediaType: "tv|movie",      //媒体类型
-    rating: "5",                //评分
-    genreTitle: "genre",        //分类
-    duration: 123,              //时长数字
-    durationText: "00:00",      // 时长文本
-    previewUrl: "url",          // 预览视频地址
-    videoUrl: "videoUrl",       // 视频播放地址
-    link: "link",               //详情页打开地址
-    episode: 0,                 // 集数
-    description: "description", // 描述
-    playerType: "system",       // 播放器类型 system | app
-    childItems: [VideoItem]     // 当前对象的嵌套，最多一层
+    id: "unique_id",            // Based on the main value of different types. When type is url, it's the corresponding url. When type is douban, imdb, or tmdb, id is the corresponding id value. For tmdb id, it needs to be composed of type.id, e.g., tv.123 movie.234.
+    type: "type",               // Type identifier url, douban, imdb, tmdb
+    title: "title",             // Title
+    posterPath: "url",          // Vertical cover image URL
+    backdropPath: "url",        // Horizontal cover URL
+    releaseDate: "date",        // Release date
+    mediaType: "tv|movie",      // Media type
+    rating: "5",                // Rating
+    genreTitle: "genre",        // Genre
+    duration: 123,              // Duration number
+    durationText: "00:00",      // Duration text
+    previewUrl: "url",          // Preview video URL
+    videoUrl: "videoUrl",       // Video playback URL
+    link: "link",               // Detail page URL
+    episode: 1,                 // Episode number
+    description: "description", // Description
+    playerType: "system",       // player type system | app
+    childItems: [VideoItem]     // Nested items of current object, maximum one level
 }
 ```
 
-### 最佳实践
+### Best Practices
 
-1. **错误处理**
-   - 使用 try-catch 捕获异常
-   - 提供有意义的错误信息
-   - 在控制台输出调试信息
+1. **Error Handling**
+   - Use try-catch to catch exceptions
+   - Provide meaningful error messages
+   - Output debug information to console
 
-2. **参数验证**
-   - 验证必要参数是否存在
-   - 验证参数值是否有效
-   - 提供默认值处理
+2. **Parameter Validation**
+   - Validate required parameters
+   - Validate parameter values
+   - Handle default values
 
-3. **性能优化**
-   - 使用适当的请求头
-   - 缓存重复使用的数据
-   - 优化 DOM 选择器
+3. **Performance Optimization**
+   - Use appropriate request headers
+   - Cache frequently used data
+   - Optimize DOM selectors
 
-4. **代码组织**
-   - 使用清晰的函数命名
-   - 添加必要的注释
-   - 模块化处理逻辑
+4. **Code Organization**
+   - Use clear function naming
+   - Add necessary comments
+   - Modularize processing logic
 
-### 弹幕分片加载流程
+### Danmu Segment Loading Process
 
-ForwardWidget 支持弹幕分片加载功能，适用于长视频（如动漫、剧集）的弹幕系统。弹幕按时间段组织，支持按需加载，提高性能和用户体验。
+ForwardWidget supports danmu segment loading functionality, suitable for long video (such as anime, TV series) danmu systems. Danmu are organized by time segments, supporting on-demand loading to improve performance and user experience.
 
-#### 弹幕模块配置
+#### Danmu Module Configuration
 
-在 `WidgetMetadata` 中配置弹幕模块时，需要指定 `type: "danmu"`：
+When configuring danmu modules in `WidgetMetadata`, you need to specify `type: "danmu"`:
 
 ```javascript
 modules: [
   {
-    id: "searchDanmu",           // 搜索弹幕模块，id 必须固定
-    title: "搜索弹幕",
+    id: "searchDanmu",           // Search danmu module, id must be fixed
+    title: "Search Danmu",
     functionName: "searchDanmu",
-    type: "danmu",               // 指定为弹幕类型
+    type: "danmu",               // Specify as danmu type
     params: []
   },
   {
-    id: "getComments",           // 获取弹幕模块，id 必须固定
-    title: "获取弹幕",
+    id: "getComments",           // Get danmu module, id must be fixed
+    title: "Get Danmu",
     functionName: "getCommentsById",
     type: "danmu",
     params: []
   },
   {
-    id: "getDanmuWithSegmentTime", // 获取指定时刻弹幕模块
-    title: "获取指定时刻弹幕",
+    id: "getDanmuWithSegmentTime", // Get danmu for specified time module
+    title: "Get Danmu for Specified Time",
     functionName: "getDanmuWithSegmentTime",
     type: "danmu",
     params: []
@@ -254,84 +251,82 @@ modules: [
 ]
 ```
 
-#### 弹幕参数说明
+#### Danmu Parameter Description
 
-弹幕模块会自动携带以下参数：
+Danmu modules automatically carry the following parameters:
 
-- **基础参数**：
-  - `tmdbId`: TMDB ID，用于本地存储标识
-  - `type`: 视频类型（tv | movie）
-  - `title`: 搜索关键词
-  - `commentId`: 弹幕ID，搜索到弹幕列表后实际加载时携带
-  - `animeId`: 动漫ID，搜索到动漫列表后实际加载时携带
+- **Basic Parameters**:
+  - `tmdbId`: TMDB ID, used for local storage identification
+  - `type`: Video type (tv | movie)
+  - `title`: Search keywords
+  - `commentId`: Danmu ID, carried when actually loading after searching danmu list
+  - `animeId`: Anime ID, carried when actually loading after searching anime list
 
-- **视频信息参数**：
-  - `seriesName`: 剧名
-  - `episodeName`: 集名
-  - `airDate`: 播出日期
-  - `runtime`: 时长
-  - `premiereDate`: 首播日期
-  - `season`: 季数（电影时为空）
-  - `episode`: 集数（电影时为空）
-  - `link`: 链接
-  - `videoUrl`: 视频链接
+- **Video Information Parameters**:
+  - `seriesName`: Series name
+  - `episodeName`: Episode name
+  - `airDate`: Air date
+  - `runtime`: Duration
+  - `premiereDate`: Premiere date
+  - `season`: Season number (empty for movies)
+  - `episode`: Episode number (empty for movies)
+  - `link`: Link
+  - `videoUrl`: Video link
 
-- **时间参数**：
-  - `segmentTime`: 指定时刻，用于获取对应时间点的弹幕
+- **Time Parameters**:
+  - `segmentTime`: Specified time, used to get danmu for corresponding time point
 
-#### 弹幕
+#### Danmu Loading Process
 
-#### 弹幕加载流程
+Danmu loading process:
 
-弹幕加载流程：
+1. **Search Danmu** (`searchDanmu`) - Search danmu resources based on video title
+2. **Get Danmu Data** (`getCommentsById`) - Get danmu segment information from server or use local cache
+3. **Time Point Matching** (`getDanmuWithSegmentTime`) - Find corresponding danmu based on playback time. Optional.
 
-1. **搜索弹幕** (`searchDanmu`) - 根据视频标题搜索弹幕资源
-2. **获取弹幕数据** (`getCommentsById`) - 从服务器获取弹幕分段信息或使用本地缓存
-3. **时间点匹配** (`getDanmuWithSegmentTime`) - 根据播放时间找到对应的弹幕。可选。
+For specific implementation code, see the `widgets/segmentDanmuExample.js` file.
 
-具体实现代码详见 `widgets/segmentDanmuExample.js` 文件。
+#### Danmu Response Format
 
-#### 弹幕响应格式
+Built-in support for mainstream danmu data formats including JSON and XML. You can also customize the returned danmu format, but must follow these specifications:
 
-内置已支持主流弹幕数据格式，包括json、xml。你也可以自定义返回的弹幕格式，但要遵循如下规范：
-
-格式 1：
+Format 1:
 ```javascript
 [
   {
-    p: "",// 时间，位置，颜色，等其他
+    p: "",// Time, position, color, and other attributes
     m: "",
     cid: "",
   }
 ]
 ```
 
-格式 2：
+Format 2:
 ```javascript
 [
   [
-    0,// 时间
-    "0",// 位置
-    "#fff",// 颜色
+    0,// Time
+    "0",// Position
+    "#fff",// Color
     "",
-    "内容" // 弹幕内容
+    "Content" // Danmu content
   ]
 ]
 ```
 
-#### 最佳实践
+#### Best Practices
 
-1. **本地缓存**：使用 `Widget.storage` 缓存弹幕分段信息，避免重复请求
-2. **分段加载**：根据播放进度按需加载对应时间段的弹幕
-3. **错误处理**：处理网络请求失败和弹幕解析异常
-4. **格式支持**：内置支持 XML 和 JSON 格式，支持 zlib 压缩
-5. **性能优化**：避免一次性加载所有弹幕，减少内存占用
+1. **Local Caching**: Use `Widget.storage` to cache danmu segment information, avoiding duplicate requests
+2. **Segment Loading**: Load danmu for corresponding time segments on-demand based on playback progress
+3. **Error Handling**: Handle network request failures and danmu parsing exceptions
+4. **Format Support**: Built-in support for XML and JSON formats, supports zlib compression
+5. **Performance Optimization**: Avoid loading all danmu at once, reduce memory usage
 
-### 调试
+### Debugging
 
-App 内置了模块测试工具
+The App has built-in module testing tools
 
-1. 使用 `console.log()` 输出调试信息
-2. 检查网络请求和响应
-3. 验证 DOM 解析结果
-4. 测试不同参数组合
+1. Use `console.log()` to output debug information
+2. Check network requests and responses
+3. Verify DOM parsing results
+4. Test different parameter combinations

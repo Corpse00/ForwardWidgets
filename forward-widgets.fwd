@@ -1,43 +1,34 @@
 {
-  "title": "Forward Widgets",
-  "description": "Forward Official Widgets",
-  "icon": "https://assets.vvebo.vip/scripts/icon.png",
+  "title": "vokdn Widgets",
+  "description": "Media widgets by vokdn",
+  "icon": "https://raw.githubusercontent.com/InchStudio/ForwardWidgets/master/icon.png",
   "widgets": [
     {
-      "id": "forward.tmdb",
+      "id": "vokdn.tmdb",
       "title": "TMDB",
-      "description": "获取 TMDB 的榜单数据",
-      "requiredVersion": "0.0.1",
-      "version": "1.0.3",
-      "author": "Forward",
-      "url": "https://assets.vvebo.vip/scripts/tmdb.js"
-    },
-    {
-      "id": "forward.trendingmedia",
-      "title": "影视数据",
-      "description": "获取时下热门电影、电视剧和综艺数据",
+      "description": "Get TMDB chart data",
       "requiredVersion": "0.0.1",
       "version": "1.0.0",
-      "author": "Forward",
-      "url": "https://assets.vvebo.vip/scripts/trendingmedia.js"
+      "author": "vokdn",
+      "url": "https://raw.githubusercontent.com/InchStudio/ForwardWidgets/master/widgets/tmdb.js"
     },
     {
-      "id": "forward.bangumi",
-      "title": "动漫数据",
-      "description": "获取时下热门动漫数据和播出日历",
+      "id": "vokdn.trakt",
+      "title": "Trakt",
+      "description": "Access your Trakt watchlist, recommendations, lists, calendar and history",
       "requiredVersion": "0.0.1",
       "version": "1.0.0",
-      "author": "Forward",
-      "url": "https://assets.vvebo.vip/scripts/bangumi.js"
+      "author": "vokdn",
+      "url": "https://raw.githubusercontent.com/InchStudio/ForwardWidgets/master/widgets/trakt.js"
     },
     {
-      "id": "forward.danmu",
-      "title": "自定义弹幕",
-      "description": "从指定服务器获取弹幕",
-      "requiredVersion": "0.0.2",
+      "id": "vokdn.trendingmedia",
+      "title": "Media Data",
+      "description": "Get trending movies, TV shows and variety shows data",
+      "requiredVersion": "0.0.1",
       "version": "1.0.0",
-      "author": "Forward",
-      "url": "https://assets.vvebo.vip/scripts/danmu.js"
+      "author": "vokdn",
+      "url": "https://raw.githubusercontent.com/InchStudio/ForwardWidgets/master/widgets/trendingmedia.js"
     }
   ]
 }
