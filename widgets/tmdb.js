@@ -699,21 +699,8 @@ async function collections(params) {
 }
 
 async function networks(params) {
-  const networkId = params.with_networks;
-
-  // Bengali streaming services are Companies, not Networks in TMDB
-  const bengaliCompanies = ["121059", "157210", "161019"];
-  const isBengali = bengaliCompanies.includes(networkId);
-
-  const api = `discover/tv`;
-  const fetchParams = { ...params };
-
-  if (isBengali) {
-    delete fetchParams.with_networks;
-    fetchParams.with_companies = networkId;
-  }
-
-  return await fetchData(api, fetchParams, "tv");
+  let api = `discover/tv`;
+  return await fetchData(api, params, "tv");
 }
 
 async function companies(params) {
