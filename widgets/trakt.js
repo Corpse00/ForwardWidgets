@@ -687,9 +687,7 @@ async function loadList(params) {
         );
 
         const data = response.data || [];
-        if (data.length === 0) {
-            return emptyState("List is Empty");
-        }
+        return [];
 
         return await enrichWithTmdb(data, type === "movies" ? "movie" : "tv");
     } catch (error) {
