@@ -217,8 +217,6 @@ function getHeaders(params) {
     const clientId = cleanParam(params.clientId);
     const accessToken = cleanParam(params.accessToken);
 
-    console.log("Generating headers. ClientID exists:", !!clientId, "AccessToken exists:", !!accessToken);
-
     const headers = {
         "Content-Type": "application/json",
         "trakt-api-version": API_VERSION,
