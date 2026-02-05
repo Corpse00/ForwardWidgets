@@ -5,7 +5,7 @@ WidgetMetadata = {
   requiredVersion: "0.0.1",
   description: "Get trending movies, TV shows and variety shows data",
   author: "vokdn",
-  site: "https://github.com/InchStudio/ForwardWidgets",
+  site: "https://github.com/Corpse00/ForwardWidgets",
   modules: [
     {
       id: "trendingMovies",

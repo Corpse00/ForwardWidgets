@@ -67,7 +67,7 @@ function extractWidgetMetadata(filePath) {
     // Extract required fields
     const { id, title, description, requiredVersion, version, author } = metadata;
 
-    const url = `https://raw.githubusercontent.com/InchStudio/ForwardWidgets/master/widgets/${fileName}`
+    const url = `https://raw.githubusercontent.com/Corpse00/ForwardWidgets/master/widgets/${fileName}`
 
     return { id, title, description, requiredVersion, version, author, url };
   } catch (error) {
@@ -96,7 +96,7 @@ async function main() {
     const metadata = {
       title: 'vokdn Widgets',
       description: 'Media widgets by vokdn',
-      icon: 'https://raw.githubusercontent.com/InchStudio/ForwardWidgets/master/icon.png',
+      icon: 'https://raw.githubusercontent.com/Corpse00/ForwardWidgets/master/icon.png',
       widgets: widgetIndex
     }
 

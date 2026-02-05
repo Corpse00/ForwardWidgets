@@ -5,7 +5,7 @@ WidgetMetadata = {
     requiredVersion: "0.0.1",
     description: "Access your Trakt watchlist, recommendations, lists, calendar and history",
     author: "vokdn",
-    site: "https://github.com/InchStudio/ForwardWidgets",
+    site: "https://github.com/Corpse00/ForwardWidgets",
 
     globalParams: [
         {
