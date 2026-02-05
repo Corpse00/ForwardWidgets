@@ -432,6 +432,7 @@ WidgetMetadata = {
             { title: "Mission Impossible", value: "87359" },
             { title: "Middle Earth", value: "119" },
             { title: "Transformers", value: "8650" },
+            { title: "Avatar", value: "87096" },
             { title: "Pirates of the Caribbean", value: "295" },
             { title: "Planet of the Apes", value: "173710" },
             { title: "Halloween", value: "91361" },
