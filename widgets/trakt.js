@@ -138,6 +138,7 @@ WidgetMetadata = {
                     type: "enumeration",
                     value: "movies",
                     enumOptions: [
+                        { title: "All", value: "all" },
                         { title: "Movies", value: "movies" },
                         { title: "TV Shows", value: "shows" }
                     ]
@@ -157,6 +158,7 @@ WidgetMetadata = {
                     type: "enumeration",
                     value: "movies",
                     enumOptions: [
+                        { title: "All", value: "all" },
                         { title: "Movies", value: "movies" },
                         { title: "TV Shows", value: "shows" }
                     ]
@@ -527,17 +529,39 @@ async function loadTrending(params) {
     const limit = 20;
 
     try {
-        const response = await Widget.http.get(
-            `${API_BASE}/${type}/trending?page=${page}&limit=${limit}`,
-            { headers: getHeaders(params) }
-        );
+        if (type === "all") {
+            const [moviesRes, showsRes] = await Promise.all([
+                Widget.http.get(
+                    `${API_BASE}/movies/trending?page=${page}&limit=${Math.ceil(limit / 2)}`,
+                    { headers: getHeaders(params) }
+                ).catch(() => ({ data: [] })),
+                Widget.http.get(
+                    `${API_BASE}/shows/trending?page=${page}&limit=${Math.floor(limit / 2)}`,
+                    { headers: getHeaders(params) }
+                ).catch(() => ({ data: [] }))
+            ]);
 
-        const data = response.data || [];
-        if (data.length === 0) return [];
+            const movies = moviesRes.data || [];
+            const shows = showsRes.data || [];
+            const interleaved = [];
+            const max = Math.max(movies.length, shows.length);
+            for (let i = 0; i < max; i++) {
+                if (movies[i]) interleaved.push({ movie: movies[i].movie || movies[i] });
+                if (shows[i]) interleaved.push({ show: shows[i].show || shows[i] });
+            }
+            return await enrichWithTmdb(interleaved, "movie");
+        } else {
+            const response = await Widget.http.get(
+                `${API_BASE}/${type}/trending?page=${page}&limit=${limit}`,
+                { headers: getHeaders(params) }
+            );
 
-        const mediaType = type === "movies" ? "movie" : "tv";
-        // Trending items are wrapped: [{ watch_count: 5, movie: {...} }]
-        return await enrichWithTmdb(data, mediaType);
+            const data = response.data || [];
+            if (data.length === 0) return [];
+
+            const mediaType = type === "movies" ? "movie" : "tv";
+            return await enrichWithTmdb(data, mediaType);
+        }
     } catch (error) {
         console.error("Trending error:", error);
         return [];
@@ -550,22 +574,43 @@ async function loadPopular(params) {
     const limit = 20;
 
     try {
-        const response = await Widget.http.get(
-            `${API_BASE}/${type}/popular?page=${page}&limit=${limit}`,
-            { headers: getHeaders(params) }
-        );
+        if (type === "all") {
+            const [moviesRes, showsRes] = await Promise.all([
+                Widget.http.get(
+                    `${API_BASE}/movies/popular?page=${page}&limit=${Math.ceil(limit / 2)}`,
+                    { headers: getHeaders(params) }
+                ).catch(() => ({ data: [] })),
+                Widget.http.get(
+                    `${API_BASE}/shows/popular?page=${page}&limit=${Math.floor(limit / 2)}`,
+                    { headers: getHeaders(params) }
+                ).catch(() => ({ data: [] }))
+            ]);
 
-        const data = response.data || [];
-        if (data.length === 0) return [];
+            const movies = (moviesRes.data || []).map(item => ({ movie: item }));
+            const shows = (showsRes.data || []).map(item => ({ show: item }));
+            const interleaved = [];
+            const max = Math.max(movies.length, shows.length);
+            for (let i = 0; i < max; i++) {
+                if (movies[i]) interleaved.push(movies[i]);
+                if (shows[i]) interleaved.push(shows[i]);
+            }
+            return await enrichWithTmdb(interleaved, "movie");
+        } else {
+            const response = await Widget.http.get(
+                `${API_BASE}/${type}/popular?page=${page}&limit=${limit}`,
+                { headers: getHeaders(params) }
+            );
 
-        const mediaType = type === "movies" ? "movie" : "tv";
+            const data = response.data || [];
+            if (data.length === 0) return [];
 
-        // Wrap items (Popular Trakt API returns raw items)
-        const wrapped = data.map(item => ({
-            [mediaType === "movie" ? "movie" : "show"]: item
-        }));
+            const mediaType = type === "movies" ? "movie" : "tv";
+            const wrapped = data.map(item => ({
+                [mediaType === "movie" ? "movie" : "show"]: item
+            }));
 
-        return await enrichWithTmdb(wrapped, mediaType);
+            return await enrichWithTmdb(wrapped, mediaType);
+        }
     } catch (error) {
         console.error("Popular error:", error);
         return [];
@@ -574,7 +619,7 @@ async function loadPopular(params) {
 
 // Public Lists (no auth required)
 async function loadList(params) {
-    const { username, listSlug, sort = "rank", page = 1 } = params;
+    const { username, listSlug, type = "all", sort = "rank", page = 1 } = params;
     const limit = 20;
 
     if (!username || !listSlug) {
@@ -587,14 +632,22 @@ async function loadList(params) {
     }
 
     try {
+        let endpoint = `/users/${username}/lists/${listSlug}/items`;
+        if (type !== "all") {
+            endpoint += `/${type === "movies" ? "movies" : "shows"}`;
+        }
+
         const response = await Widget.http.get(
-            `${API_BASE}/users/${username}/lists/${listSlug}/items?page=${page}&limit=${limit}&sort=${sort}`,
+            `${API_BASE}${endpoint}?page=${page}&limit=${limit}&sort=${sort}`,
             { headers: getHeaders(params) }
         );
 
         const data = response.data || [];
+        if (data.length === 0) {
+            return emptyState("List is Empty");
+        }
 
-        return await enrichWithTmdb(data, "movie");
+        return await enrichWithTmdb(data, type === "movies" ? "movie" : "tv");
     } catch (error) {
         console.error("List error:", error);
         return [];
