@@ -87,8 +87,10 @@ WidgetMetadata = {
                     type: "enumeration",
                     value: "my-shows",
                     enumOptions: [
+                        { title: "My All", value: "my-all" },
                         { title: "My Shows", value: "my-shows" },
                         { title: "My Movies", value: "my-movies" },
+                        { title: "New All", value: "all-all" },
                         { title: "New Shows", value: "all-shows" },
                         { title: "New Movies", value: "all-movies" }
                     ]
@@ -478,8 +480,39 @@ async function loadRecommendations(params) {
 // Calendar
 async function loadCalendar(params) {
     const { type, days = "7" } = params;
-
     const today = new Date().toISOString().split("T")[0];
+
+    if (type === "my-all" || type === "all-all") {
+        const isPersonal = type.startsWith("my-");
+        const base = isPersonal ? "/calendars/my" : "/calendars/all";
+
+        const [moviesRes, showsRes] = await Promise.all([
+            Widget.http.get(`${API_BASE}${base}/movies/${today}/${days}`, {
+                headers: getHeaders(params)
+            }).catch(() => ({ data: [] })),
+            Widget.http.get(`${API_BASE}${base}/shows/${today}/${days}`, {
+                headers: getHeaders(params)
+            }).catch(() => ({ data: [] }))
+        ]);
+
+        const movies = moviesRes.data || [];
+        const shows = showsRes.data || [];
+
+        // Interleave results
+        const interleaved = [];
+        const max = Math.max(movies.length, shows.length);
+        for (let i = 0; i < max; i++) {
+            if (movies[i]) interleaved.push(movies[i]);
+            if (shows[i]) interleaved.push(shows[i]);
+        }
+
+        if (interleaved.length === 0) {
+            return emptyState("Calendar is Empty", "No upcoming releases found for this period.");
+        }
+
+        return await enrichWithTmdb(interleaved, "movie");
+    }
+
     const isPersonal = type.startsWith("my-");
     const mediaType = type.includes("shows") ? "shows" : "movies";
 
