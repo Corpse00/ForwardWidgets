@@ -20,15 +20,6 @@
       "version": "1.0.0",
       "author": "vokdn",
       "url": "https://raw.githubusercontent.com/Corpse00/ForwardWidgets/master/widgets/trakt.js"
-    },
-    {
-      "id": "vokdn.trendingmedia",
-      "title": "Media Data",
-      "description": "Get trending movies, TV shows and variety shows data",
-      "requiredVersion": "0.0.1",
-      "version": "1.0.0",
-      "author": "vokdn",
-      "url": "https://raw.githubusercontent.com/Corpse00/ForwardWidgets/master/widgets/trendingmedia.js"
     }
   ]
 }
