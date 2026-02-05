@@ -306,11 +306,10 @@ WidgetMetadata = {
       id: "networks",
       title: "Networks",
       functionName: "networks",
-      cacheDuration: 43200,
       params: [
         {
           name: "with_networks",
-          title: "Network",
+          title: "Networks",
           type: "input",
           placeholders: [
             {
@@ -340,29 +339,17 @@ WidgetMetadata = {
             {
               title: "Paramount+",
               value: "4330",
-            },
-            {
-              title: "Hoichoi",
-              value: "121059",
-            },
-            {
-              title: "Chorki",
-              value: "157210",
-            },
-            {
-              title: "Bongo",
-              value: "161019",
             }
           ],
         },
         {
           name: "page",
-          title: "Page",
+          title: "page",
           type: "page"
         },
         {
           name: "language",
-          title: "Language",
+          title: "language",
           type: "language",
           value: "en-US",
         },
