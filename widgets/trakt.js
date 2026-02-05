@@ -368,7 +368,7 @@ async function loadRecommendations(params) {
             id: "error",
             type: "text",
             title: "Authentication Required",
-            description: "Recommendations require OAuth. Use the Authorize module first."
+            description: "Recommendations require OAuth. Please enter your Client ID and Access Token in the Global Parameters."
         }];
     }
 
