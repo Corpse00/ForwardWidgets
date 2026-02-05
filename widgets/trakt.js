@@ -191,6 +191,17 @@ WidgetMetadata = {
                     ]
                 },
                 {
+                    name: "type",
+                    title: "Type",
+                    type: "enumeration",
+                    value: "all",
+                    enumOptions: [
+                        { title: "All", value: "all" },
+                        { title: "Movies", value: "movies" },
+                        { title: "TV Shows", value: "shows" }
+                    ]
+                },
+                {
                     name: "sort",
                     title: "Sort By",
                     type: "enumeration",
