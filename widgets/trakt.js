@@ -18,25 +18,11 @@ WidgetMetadata = {
             name: "accessToken",
             title: "Access Token",
             type: "input",
-            description: "OAuth access token. Use the authorize module to get one."
+            description: "Get token: 1) Create app at trakt.tv/oauth/applications 2) Use POST https://api.trakt.tv/oauth/device/code with your client_id 3) Visit trakt.tv/activate and enter the user_code 4) Poll POST https://api.trakt.tv/oauth/device/token to get access_token"
         }
     ],
 
     modules: [
-        {
-            id: "authorize",
-            title: "Authorize",
-            functionName: "authorize",
-            description: "Get OAuth access token",
-            params: [
-                {
-                    name: "deviceCode",
-                    title: "Device Code",
-                    type: "input",
-                    description: "Leave empty to start authorization. Paste device code here after visiting trakt.tv/activate"
-                }
-            ]
-        },
         {
             id: "watchlist",
             title: "Watchlist",
