@@ -27,6 +27,7 @@ WidgetMetadata = {
             id: "watchlist",
             title: "Watchlist",
             functionName: "loadWatchlist",
+            cacheDuration: 43200,
             params: [
                 {
                     name: "type",
@@ -58,13 +59,15 @@ WidgetMetadata = {
             id: "recommendations",
             title: "Recommendations",
             functionName: "loadRecommendations",
+            cacheDuration: 43200,
             params: [
                 {
                     name: "type",
                     title: "Type",
                     type: "enumeration",
-                    value: "movies",
+                    value: "all",
                     enumOptions: [
+                        { title: "All", value: "all" },
                         { title: "Movies", value: "movies" },
                         { title: "TV Shows", value: "shows" }
                     ]
@@ -76,6 +79,7 @@ WidgetMetadata = {
             id: "calendar",
             title: "Calendar",
             functionName: "loadCalendar",
+            cacheDuration: 43200,
             params: [
                 {
                     name: "type",
@@ -106,6 +110,7 @@ WidgetMetadata = {
             id: "history",
             title: "History",
             functionName: "loadHistory",
+            cacheDuration: 43200,
             params: [
                 {
                     name: "type",
@@ -125,6 +130,7 @@ WidgetMetadata = {
             id: "trending",
             title: "Trending",
             functionName: "loadTrending",
+            cacheDuration: 43200,
             params: [
                 {
                     name: "type",
@@ -143,6 +149,7 @@ WidgetMetadata = {
             id: "popular",
             title: "Popular",
             functionName: "loadPopular",
+            cacheDuration: 43200,
             params: [
                 {
                     name: "type",
@@ -161,6 +168,7 @@ WidgetMetadata = {
             id: "lists",
             title: "Public Lists",
             functionName: "loadList",
+            cacheDuration: 43200,
             params: [
                 {
                     name: "username",
@@ -373,20 +381,46 @@ async function loadRecommendations(params) {
     }
 
     try {
-        const response = await Widget.http.get(
-            `${API_BASE}/recommendations/${type}?page=${page}&limit=${limit}&extended=full`,
-            { headers: getHeaders(params) }
-        );
+        if (type === "all") {
+            const [moviesRes, showsRes] = await Promise.all([
+                Widget.http.get(
+                    `${API_BASE}/recommendations/movies?page=${page}&limit=${Math.ceil(limit / 2)}&extended=full`,
+                    { headers: getHeaders(params) }
+                ),
+                Widget.http.get(
+                    `${API_BASE}/recommendations/shows?page=${page}&limit=${Math.floor(limit / 2)}&extended=full`,
+                    { headers: getHeaders(params) }
+                )
+            ]);
 
-        const data = response.data || [];
-        const mediaType = type === "movies" ? "movie" : "tv";
+            const movies = (moviesRes.data || []).map(item => ({ movie: item }));
+            const shows = (showsRes.data || []).map(item => ({ show: item }));
 
-        // Wrap items in expected format
-        const wrapped = data.map(item => ({
-            [mediaType]: item
-        }));
+            // Interleave results
+            const interleaved = [];
+            const max = Math.max(movies.length, shows.length);
+            for (let i = 0; i < max; i++) {
+                if (movies[i]) interleaved.push(movies[i]);
+                if (shows[i]) interleaved.push(shows[i]);
+            }
 
-        return await enrichWithTmdb(wrapped, mediaType);
+            return await enrichWithTmdb(interleaved, "movie");
+        } else {
+            const response = await Widget.http.get(
+                `${API_BASE}/recommendations/${type}?page=${page}&limit=${limit}&extended=full`,
+                { headers: getHeaders(params) }
+            );
+
+            const data = response.data || [];
+            const mediaType = type === "movies" ? "movie" : "tv";
+
+            // Wrap items in expected format
+            const wrapped = data.map(item => ({
+                [mediaType]: item
+            }));
+
+            return await enrichWithTmdb(wrapped, mediaType);
+        }
     } catch (error) {
         console.error("Recommendations error:", error);
         return [{

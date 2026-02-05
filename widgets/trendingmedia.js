@@ -11,6 +11,7 @@ WidgetMetadata = {
       id: "trendingMovies",
       title: "Trending Movies",
       functionName: "trendingMovies",
+      cacheDuration: 43200,
       params: [
       ],
     },
@@ -18,6 +19,7 @@ WidgetMetadata = {
       id: "latestMovies",
       title: "Latest Movies",
       functionName: "latestMovies",
+      cacheDuration: 43200,
       params: [
       ],
     },
@@ -25,6 +27,7 @@ WidgetMetadata = {
       id: "trendingTV",
       title: "Trending TV Shows",
       functionName: "trendingTV",
+      cacheDuration: 43200,
       params: [
       ],
     },
@@ -32,6 +35,7 @@ WidgetMetadata = {
       id: "trendingVariety",
       title: "Trending Variety Shows",
       functionName: "trendingVariety",
+      cacheDuration: 43200,
       params: [
       ],
     },

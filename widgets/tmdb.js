@@ -11,6 +11,7 @@ WidgetMetadata = {
       id: "nowPlaying",
       title: "Now Playing",
       functionName: "nowPlaying",
+      cacheDuration: 43200,
       params: [
         {
           name: "type",
@@ -44,6 +45,7 @@ WidgetMetadata = {
       id: "trending",
       title: "Trending",
       functionName: "trending",
+      cacheDuration: 43200,
       params: [
         {
           name: "time_window",
@@ -72,6 +74,7 @@ WidgetMetadata = {
       id: "popular",
       title: "Popular",
       functionName: "popular",
+      cacheDuration: 43200,
       params: [
         {
           name: "type",
@@ -105,6 +108,7 @@ WidgetMetadata = {
       id: "topRated",
       title: "Top Rated",
       functionName: "topRated",
+      cacheDuration: 43200,
       params: [
         {
           name: "type",
@@ -138,6 +142,7 @@ WidgetMetadata = {
       id: "categories",
       title: "Categories",
       functionName: "categories",
+      cacheDuration: 43200,
       params: [
         {
           name: "with_genres",
@@ -266,6 +271,7 @@ WidgetMetadata = {
       id: "networks",
       title: "Networks",
       functionName: "networks",
+      cacheDuration: 43200,
       params: [
         {
           name: "with_networks",
@@ -319,6 +325,7 @@ WidgetMetadata = {
       id: "companies",
       title: "Production Companies",
       functionName: "companies",
+      cacheDuration: 43200,
       params: [
         {
           name: "with_companies",
@@ -376,6 +383,7 @@ WidgetMetadata = {
       id: "list",
       title: "Lists",
       functionName: "list",
+      cacheDuration: 43200,
       params: [
         {
           name: "url",
