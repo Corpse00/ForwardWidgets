@@ -204,23 +204,23 @@ const API_BASE = "https://api.trakt.tv";
 const API_VERSION = "2";
 
 function getHeaders(params) {
-    console.log("Generating headers with params:", JSON.stringify(params));
+    const cleanParam = (val) => typeof val === 'string' ? val.replace(/^(cid|acctoken|token|key):\s*/i, '').trim() : val;
 
-    if (!params.clientId) {
-        console.warn("Client ID is missing from params!");
-    }
+    const clientId = cleanParam(params.clientId);
+    const accessToken = cleanParam(params.accessToken);
+
+    console.log("Generating headers. ClientID exists:", !!clientId, "AccessToken exists:", !!accessToken);
 
     const headers = {
         "Content-Type": "application/json",
         "trakt-api-version": API_VERSION,
-        "trakt-api-key": params.clientId || ""
+        "trakt-api-key": clientId || ""
     };
 
-    if (params.accessToken) {
-        headers["Authorization"] = `Bearer ${params.accessToken}`;
+    if (accessToken) {
+        headers["Authorization"] = `Bearer ${accessToken}`;
     }
 
-    console.log("Final headers:", JSON.stringify(headers));
     return headers;
 }
 
