@@ -258,7 +258,11 @@ WidgetMetadata = {
                     name: "listSlug",
                     title: "List",
                     type: "input",
-                    description: "Your list slug (from URL). Leave empty to see all your lists."
+                    description: "Your list slug (from URL). Leave empty to see all your lists.",
+                    placeholders: [
+                        { title: "movies-recommendations-couchmoney-tv", value: "movies-recommendations-couchmoney-tv" },
+                        { title: "tv-recommendations-couchmoney-tv", value: "tv-recommendations-couchmoney-tv" }
+                    ]
                 },
                 {
                     name: "type",
@@ -829,146 +833,48 @@ async function loadMyLists(params) {
     }
 
     try {
-        // Fetch all user's lists for pairing detection
-        const listsRes = await Widget.http.get(
-            `${API_BASE}/users/me/lists`,
-            { headers: getHeaders(params) }
-        );
-        const allLists = listsRes.data || [];
-
-        // Build a map of paired lists: group movies-* and tv-* by their common suffix
-        const pairs = {};
-        const standalone = [];
-        for (const list of allLists) {
-            const slug = list.ids?.slug || "";
-            if (slug.startsWith("movies-")) {
-                const key = slug.slice(7);
-                pairs[key] = pairs[key] || {};
-                pairs[key].movies = list;
-            } else if (slug.startsWith("tv-")) {
-                const key = slug.slice(3);
-                pairs[key] = pairs[key] || {};
-                pairs[key].tv = list;
-            } else {
-                standalone.push(list);
-            }
-        }
-
-        // If no list slug provided, show merged + standalone lists
+        // If no list slug provided, show all user's lists as text items
         if (!listSlug) {
-            if (allLists.length === 0) {
-                return emptyState("No Lists", "You haven't created any lists on Trakt yet.");
-            }
-
-            const results = [];
-
-            // Show merged pairs first
-            for (const [key, pair] of Object.entries(pairs)) {
-                if (pair.movies && pair.tv) {
-                    const totalItems = (pair.movies.item_count || 0) + (pair.tv.item_count || 0);
-                    const displayName = key.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-                    results.push({
-                        id: key,
-                        type: "text",
-                        title: displayName,
-                        description: `${totalItems} items (${pair.movies.item_count} movies + ${pair.tv.item_count} shows) • Slug: ${key}`
-                    });
-                } else {
-                    const list = pair.movies || pair.tv;
-                    results.push({
-                        id: list.ids?.slug || list.name,
-                        type: "text",
-                        title: list.name,
-                        description: `${list.item_count} items • Slug: ${list.ids?.slug}`
-                    });
-                }
-            }
-
-            // Show standalone lists
-            for (const list of standalone) {
-                results.push({
-                    id: list.ids?.slug || list.name,
-                    type: "text",
-                    title: list.name,
-                    description: `${list.item_count} items • Slug: ${list.ids?.slug}\n${list.description || ""}`
-                });
-            }
-
-            return results;
-        }
-
-        // Check if the slug is a merged pair key
-        const isMergedPair = pairs[listSlug]?.movies && pairs[listSlug]?.tv;
-        // Also check if the slug directly matches an existing list
-        const directMatch = allLists.find(l => l.ids?.slug === listSlug);
-
-        if (isMergedPair) {
-            const movieSlug = `movies-${listSlug}`;
-            const tvSlug = `tv-${listSlug}`;
-            const halfLimit = Math.ceil(limit / 2);
-
-            if (type === "movies") {
-                const res = await Widget.http.get(
-                    `${API_BASE}/users/me/lists/${movieSlug}/items?page=${page}&limit=${limit}`,
-                    { headers: getHeaders(params) }
-                );
-                return sortResults(await enrichWithTmdb(res.data || [], "movie"), sort);
-            } else if (type === "shows") {
-                const res = await Widget.http.get(
-                    `${API_BASE}/users/me/lists/${tvSlug}/items?page=${page}&limit=${limit}`,
-                    { headers: getHeaders(params) }
-                );
-                return sortResults(await enrichWithTmdb(res.data || [], "tv"), sort);
-            } else {
-                // All: fetch from both and interleave
-                const [moviesRes, tvRes] = await Promise.all([
-                    Widget.http.get(
-                        `${API_BASE}/users/me/lists/${movieSlug}/items?page=${page}&limit=${halfLimit}`,
-                        { headers: getHeaders(params) }
-                    ).catch(() => ({ data: [] })),
-                    Widget.http.get(
-                        `${API_BASE}/users/me/lists/${tvSlug}/items?page=${page}&limit=${halfLimit}`,
-                        { headers: getHeaders(params) }
-                    ).catch(() => ({ data: [] }))
-                ]);
-
-                const movieItems = moviesRes.data || [];
-                const tvItems = tvRes.data || [];
-                const combined = [];
-                const max = Math.max(movieItems.length, tvItems.length);
-                for (let i = 0; i < max; i++) {
-                    if (movieItems[i]) combined.push(movieItems[i]);
-                    if (tvItems[i]) combined.push(tvItems[i]);
-                }
-
-                if (combined.length === 0) {
-                    return emptyState("List is Empty", "This list has no items yet.");
-                }
-
-                return sortResults(await enrichWithTmdb(combined, "movie"), sort);
-            }
-        } else if (directMatch) {
-            let endpoint = `/users/me/lists/${listSlug}/items`;
-            if (type !== "all") {
-                endpoint += `/${type === "movies" ? "movies" : "shows"}`;
-            }
-
             const response = await Widget.http.get(
-                `${API_BASE}${endpoint}?page=${page}&limit=${limit}`,
+                `${API_BASE}/users/me/lists`,
                 { headers: getHeaders(params) }
             );
 
-            const data = response.data || [];
-            if (data.length === 0) {
-                return emptyState("List is Empty", "This list has no items yet.");
+            const lists = response.data || [];
+            if (lists.length === 0) {
+                return emptyState("No Lists", "You haven't created any lists on Trakt yet.");
             }
 
-            return sortResults(await enrichWithTmdb(data, type === "movies" ? "movie" : "tv"), sort);
-        } else {
-            return emptyState("List Not Found", `No list found with slug "${listSlug}". Leave the field empty to see all your lists.`);
+            return lists.map(list => ({
+                id: list.ids?.slug || list.name,
+                type: "text",
+                title: list.name,
+                description: `${list.item_count} items • Slug: ${list.ids?.slug}\n${list.description || ""}`
+            }));
         }
+
+        // Fetch items from a specific list
+        let endpoint = `/users/me/lists/${listSlug}/items`;
+        if (type !== "all") {
+            endpoint += `/${type === "movies" ? "movies" : "shows"}`;
+        }
+
+        const response = await Widget.http.get(
+            `${API_BASE}${endpoint}?page=${page}&limit=${limit}&sort=${sort}`,
+            { headers: getHeaders(params) }
+        );
+
+        const data = response.data || [];
+        if (data.length === 0) {
+            return emptyState("List is Empty", "This list has no items yet.");
+        }
+
+        return await enrichWithTmdb(data, type === "movies" ? "movie" : "tv");
     } catch (error) {
         console.error("My Lists error:", error);
+        if (error.message?.includes("404")) {
+            return emptyState("List Not Found", `No list found with slug "${listSlug}". Leave the field empty to see all your lists.`);
+        }
         return [];
     }
 }
