@@ -286,6 +286,18 @@ WidgetMetadata = {
           ],
         },
         {
+          name: "sort_by",
+          title: "Sort By",
+          type: "enumeration",
+          enumOptions: [
+            { title: "Popularity", value: "popularity.desc" },
+            { title: "Rating", value: "vote_average.desc" },
+            { title: "Release Date", value: "primary_release_date.desc" },
+            { title: "Revenue", value: "revenue.desc" },
+            { title: "Title", value: "original_title.asc" },
+          ],
+        },
+        {
           name: "page",
           title: "Page",
           type: "page"
@@ -340,6 +352,17 @@ WidgetMetadata = {
           ],
         },
         {
+          name: "sort_by",
+          title: "Sort By",
+          type: "enumeration",
+          enumOptions: [
+            { title: "Popularity", value: "popularity.desc" },
+            { title: "Rating", value: "vote_average.desc" },
+            { title: "First Air Date", value: "first_air_date.desc" },
+            { title: "Title", value: "original_name.asc" },
+          ],
+        },
+        {
           name: "page",
           title: "Page",
           type: "page"
@@ -354,12 +377,12 @@ WidgetMetadata = {
     },
     {
       id: "companies",
-      title: "Production Companies",
+      title: "Studios",
       functionName: "companies",
       params: [
         {
           name: "with_companies",
-          title: "Company",
+          title: "Studio",
           type: "enumeration",
           enumOptions: [
             {
@@ -399,10 +422,56 @@ WidgetMetadata = {
               value: "420",
             },
             {
-              title: "DC Entertainment",
-              value: "9993",
+              title: "DC Studios",
+              value: "128064",
+            },
+            {
+              title: "A24",
+              value: "41077",
+            },
+            {
+              title: "Pixar",
+              value: "3",
+            },
+            {
+              title: "DreamWorks",
+              value: "521",
+            },
+            {
+              title: "Lucasfilm",
+              value: "1",
+            },
+            {
+              title: "Illumination",
+              value: "6704",
+            },
+            {
+              title: "Blumhouse",
+              value: "3172",
             },
           ]
+        },
+        {
+          name: "type",
+          title: "Type",
+          type: "enumeration",
+          enumOptions: [
+            { title: "All", value: "all" },
+            { title: "Movies", value: "movie" },
+            { title: "TV Shows", value: "tv" },
+          ],
+        },
+        {
+          name: "sort_by",
+          title: "Sort By",
+          type: "enumeration",
+          enumOptions: [
+            { title: "Popularity", value: "popularity.desc" },
+            { title: "Rating", value: "vote_average.desc" },
+            { title: "Release Date", value: "primary_release_date.desc" },
+            { title: "Revenue", value: "revenue.desc" },
+            { title: "Title", value: "original_title.asc" },
+          ],
         },
         {
           name: "page",
@@ -497,6 +566,17 @@ WidgetMetadata = {
             { title: "Transformers", value: "8650" },
             { title: "Twilight", value: "33514" },
             { title: "Wizarding World", value: "1241,435259" },
+          ],
+        },
+        {
+          name: "sort",
+          title: "Sort By",
+          type: "enumeration",
+          enumOptions: [
+            { title: "Chronological", value: "chronological" },
+            { title: "Newest First", value: "newest" },
+            { title: "Rating", value: "rating" },
+            { title: "Title", value: "title" },
           ],
         },
         {
@@ -695,14 +775,52 @@ async function networks(params) {
 }
 
 async function companies(params) {
-  let api = `discover/movie`;
+  const type = params.type;
+  if (type === "all") {
+    const movieParams = { ...params };
+    delete movieParams.type;
+    const tvParams = { ...params };
+    delete tvParams.type;
+    // Adjust sort_by for TV (first_air_date vs primary_release_date)
+    if (tvParams.sort_by === "primary_release_date.desc") {
+      tvParams.sort_by = "first_air_date.desc";
+    }
+    if (tvParams.sort_by === "original_title.asc") {
+      tvParams.sort_by = "original_name.asc";
+    }
+    const [movies, tv] = await Promise.all([
+      fetchData("discover/movie", movieParams, "movie"),
+      fetchData("discover/tv", tvParams, "tv"),
+    ]);
+    const result = [];
+    for (let i = 0; i < Math.max(movies.length, tv.length); i++) {
+      if (movies[i]) result.push(movies[i]);
+      if (tv[i]) result.push(tv[i]);
+    }
+    return result;
+  }
+
+  if (type === "tv") {
+    delete params.type;
+    // Adjust sort_by for TV
+    if (params.sort_by === "primary_release_date.desc") {
+      params.sort_by = "first_air_date.desc";
+    }
+    if (params.sort_by === "original_title.asc") {
+      params.sort_by = "original_name.asc";
+    }
+    return await fetchData("discover/tv", params, "tv");
+  }
+
   delete params.type;
-  return await fetchData(api, params, "movie");
+  return await fetchData("discover/movie", params, "movie");
 }
 
 async function collections(params) {
   const parts = params.collection_id.split(",");
+  const sortBy = params.sort || "chronological";
   delete params.collection_id;
+  delete params.sort;
 
   // Separate movie collection IDs and TV show IDs
   const collectionIds = [];
@@ -779,8 +897,20 @@ async function collections(params) {
     });
   }
 
-  // Sort chronologically: Old to New (franchise viewing order)
+  // Sort based on user preference
   return result.sort((a, b) => {
+    if (sortBy === "newest") {
+      const dateA = a.releaseDate ? new Date(a.releaseDate) : new Date(0);
+      const dateB = b.releaseDate ? new Date(b.releaseDate) : new Date(0);
+      return dateB - dateA;
+    }
+    if (sortBy === "rating") {
+      return (b.rating || 0) - (a.rating || 0);
+    }
+    if (sortBy === "title") {
+      return (a.title || "").localeCompare(b.title || "");
+    }
+    // Default: chronological (old to new)
     const dateA = a.releaseDate ? new Date(a.releaseDate) : new Date(0);
     const dateB = b.releaseDate ? new Date(b.releaseDate) : new Date(0);
     return dateA - dateB;

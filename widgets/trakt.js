@@ -72,6 +72,18 @@ WidgetMetadata = {
                         { title: "TV Shows", value: "shows" }
                     ]
                 },
+                {
+                    name: "sort",
+                    title: "Sort By",
+                    type: "enumeration",
+                    value: "default",
+                    enumOptions: [
+                        { title: "Default", value: "default" },
+                        { title: "Rating", value: "rating" },
+                        { title: "Release Date", value: "release_date" },
+                        { title: "Title", value: "title" }
+                    ]
+                },
                 { name: "page", title: "Page", type: "page" }
             ]
         },
@@ -125,6 +137,18 @@ WidgetMetadata = {
                         { title: "Shows", value: "shows" }
                     ]
                 },
+                {
+                    name: "sort",
+                    title: "Sort By",
+                    type: "enumeration",
+                    value: "default",
+                    enumOptions: [
+                        { title: "Default", value: "default" },
+                        { title: "Rating", value: "rating" },
+                        { title: "Release Date", value: "release_date" },
+                        { title: "Title", value: "title" }
+                    ]
+                },
                 { name: "page", title: "Page", type: "page" }
             ]
         },
@@ -145,6 +169,18 @@ WidgetMetadata = {
                         { title: "TV Shows", value: "shows" }
                     ]
                 },
+                {
+                    name: "sort",
+                    title: "Sort By",
+                    type: "enumeration",
+                    value: "default",
+                    enumOptions: [
+                        { title: "Default", value: "default" },
+                        { title: "Rating", value: "rating" },
+                        { title: "Release Date", value: "release_date" },
+                        { title: "Title", value: "title" }
+                    ]
+                },
                 { name: "page", title: "Page", type: "page" }
             ]
         },
@@ -163,6 +199,18 @@ WidgetMetadata = {
                         { title: "All", value: "all" },
                         { title: "Movies", value: "movies" },
                         { title: "TV Shows", value: "shows" }
+                    ]
+                },
+                {
+                    name: "sort",
+                    title: "Sort By",
+                    type: "enumeration",
+                    value: "default",
+                    enumOptions: [
+                        { title: "Default", value: "default" },
+                        { title: "Rating", value: "rating" },
+                        { title: "Release Date", value: "release_date" },
+                        { title: "Title", value: "title" }
                     ]
                 },
                 { name: "page", title: "Page", type: "page" }
@@ -245,73 +293,19 @@ function getHeaders(params) {
     return headers;
 }
 
-// OAuth Device Authorization Flow
-async function authorize(params) {
-    const { clientId, deviceCode } = params;
-
-    if (!clientId) {
-        return [{
-            id: "error",
-            type: "text",
-            title: "Client ID Required",
-            description: "Create an app at trakt.tv/oauth/applications and enter your Client ID in global params"
-        }];
-    }
-
-    // Step 1: If no device code, start the flow
-    if (!deviceCode) {
-        try {
-            const response = await Widget.http.post(`${API_BASE}/oauth/device/code`, {
-                body: JSON.stringify({ client_id: clientId }),
-                headers: { "Content-Type": "application/json" }
-            });
-
-            const data = response.data;
-
-            return [{
-                id: "auth-instructions",
-                type: "text",
-                title: "Authorization Required",
-                description: `1. Visit: ${data.verification_url}\n2. Enter code: ${data.user_code}\n3. After authorizing, paste this device code in the field above:\n\n${data.device_code}`
-            }];
-        } catch (error) {
-            return [{
-                id: "error",
-                type: "text",
-                title: "Authorization Failed",
-                description: error.message
-            }];
+// Sort enriched results client-side
+function sortResults(items, sortBy) {
+    if (!sortBy || sortBy === "default") return items;
+    return items.sort((a, b) => {
+        if (sortBy === "rating") return (b.rating || 0) - (a.rating || 0);
+        if (sortBy === "release_date") {
+            const dateA = a.releaseDate ? new Date(a.releaseDate) : new Date(0);
+            const dateB = b.releaseDate ? new Date(b.releaseDate) : new Date(0);
+            return dateB - dateA;
         }
-    }
-
-    // Step 2: If device code provided, poll for token
-    try {
-        const response = await Widget.http.post(`${API_BASE}/oauth/device/token`, {
-            body: JSON.stringify({
-                code: deviceCode,
-                client_id: clientId
-            }),
-            headers: { "Content-Type": "application/json" }
-        });
-
-        const data = response.data;
-
-        if (data.access_token) {
-            return [{
-                id: "success",
-                type: "text",
-                title: "Authorization Successful",
-                description: `Copy this access token to your global params:\n\n${data.access_token}`
-            }];
-        }
-    } catch (error) {
-        return [{
-            id: "pending",
-            type: "text",
-            title: "Authorization Pending",
-            description: "Please complete authorization at trakt.tv/activate, then try again"
-        }];
-    }
+        if (sortBy === "title") return (a.title || "").localeCompare(b.title || "");
+        return 0;
+    });
 }
 
 // Fetch TMDB details for rich metadata
@@ -339,7 +333,9 @@ async function enrichWithTmdb(items, mediaType) {
             if (!tmdb) return null;
 
             const releaseDate = tmdb.release_date || tmdb.first_air_date || "";
-            const year = releaseDate.substring(0, 4);
+            const genres = tmdb.genres
+                ? tmdb.genres.map(g => g.name).slice(0, 2).join(", ")
+                : "";
 
             return {
                 id: String(tmdb.id),
@@ -352,7 +348,7 @@ async function enrichWithTmdb(items, mediaType) {
                 posterPath: tmdb.poster_path,
                 backdropPath: tmdb.backdrop_path,
                 rating: tmdb.vote_average,
-                genreTitle: year
+                genreTitle: genres
             };
         } catch (e) {
             console.error(`Failed to enrich item ${media.ids.tmdb}:`, e.message);
@@ -373,10 +369,19 @@ function emptyState(title, description) {
     }];
 }
 
-// Watchlist
+// Watchlist (requires OAuth)
 async function loadWatchlist(params) {
     const { type, sort, page = 1 } = params;
     const limit = 20;
+
+    if (!params.accessToken) {
+        return [{
+            id: "error",
+            type: "text",
+            title: "Authentication Required",
+            description: "Watchlist requires OAuth. Please enter your Client ID and Access Token in the Global Parameters."
+        }];
+    }
 
     let endpoint = "/users/me/watchlist";
     if (type !== "all") {
@@ -405,7 +410,7 @@ async function loadWatchlist(params) {
 
 // Recommendations (requires OAuth)
 async function loadRecommendations(params) {
-    const { type, page = 1 } = params;
+    const { type, sort, page = 1 } = params;
     const limit = 20;
 
     if (!params.accessToken) {
@@ -445,7 +450,7 @@ async function loadRecommendations(params) {
                 return emptyState("No Recommendations", "Trakt doesn't have any recommendations for you yet. Try watching and rating more content!");
             }
 
-            return await enrichWithTmdb(interleaved, "movie");
+            return sortResults(await enrichWithTmdb(interleaved, "movie"), sort);
         } else {
             const response = await Widget.http.get(
                 `${API_BASE}/recommendations/${type}?page=${page}&limit=${limit}&extended=full`,
@@ -464,7 +469,7 @@ async function loadRecommendations(params) {
                 [mediaType === "movie" ? "movie" : "show"]: item
             }));
 
-            return await enrichWithTmdb(wrapped, mediaType);
+            return sortResults(await enrichWithTmdb(wrapped, mediaType), sort);
         }
     } catch (error) {
         console.error("Recommendations error:", error);
@@ -538,10 +543,19 @@ async function loadCalendar(params) {
     }
 }
 
-// History
+// History (requires OAuth)
 async function loadHistory(params) {
-    const { type, page = 1 } = params;
+    const { type, sort, page = 1 } = params;
     const limit = 20;
+
+    if (!params.accessToken) {
+        return [{
+            id: "error",
+            type: "text",
+            title: "Authentication Required",
+            description: "History requires OAuth. Please enter your Client ID and Access Token in the Global Parameters."
+        }];
+    }
 
     let endpoint = "/users/me/history";
     if (type !== "all") {
@@ -560,7 +574,7 @@ async function loadHistory(params) {
         }
 
         // History items have type and a property named after it
-        return await enrichWithTmdb(data, "movie");
+        return sortResults(await enrichWithTmdb(data, "movie"), sort);
     } catch (error) {
         console.error("History error:", error);
         return [];
@@ -569,7 +583,7 @@ async function loadHistory(params) {
 
 // Trending (no auth required)
 async function loadTrending(params) {
-    const { type, page = 1 } = params;
+    const { type, sort, page = 1 } = params;
     const limit = 20;
 
     try {
@@ -593,7 +607,7 @@ async function loadTrending(params) {
                 if (movies[i]) interleaved.push({ movie: movies[i].movie || movies[i] });
                 if (shows[i]) interleaved.push({ show: shows[i].show || shows[i] });
             }
-            return await enrichWithTmdb(interleaved, "movie");
+            return sortResults(await enrichWithTmdb(interleaved, "movie"), sort);
         } else {
             const response = await Widget.http.get(
                 `${API_BASE}/${type}/trending?page=${page}&limit=${limit}`,
@@ -604,7 +618,7 @@ async function loadTrending(params) {
             if (data.length === 0) return [];
 
             const mediaType = type === "movies" ? "movie" : "tv";
-            return await enrichWithTmdb(data, mediaType);
+            return sortResults(await enrichWithTmdb(data, mediaType), sort);
         }
     } catch (error) {
         console.error("Trending error:", error);
@@ -614,7 +628,7 @@ async function loadTrending(params) {
 
 // Popular (no auth required)
 async function loadPopular(params) {
-    const { type, page = 1 } = params;
+    const { type, sort, page = 1 } = params;
     const limit = 20;
 
     try {
@@ -638,7 +652,7 @@ async function loadPopular(params) {
                 if (movies[i]) interleaved.push(movies[i]);
                 if (shows[i]) interleaved.push(shows[i]);
             }
-            return await enrichWithTmdb(interleaved, "movie");
+            return sortResults(await enrichWithTmdb(interleaved, "movie"), sort);
         } else {
             const response = await Widget.http.get(
                 `${API_BASE}/${type}/popular?page=${page}&limit=${limit}`,
@@ -653,7 +667,7 @@ async function loadPopular(params) {
                 [mediaType === "movie" ? "movie" : "show"]: item
             }));
 
-            return await enrichWithTmdb(wrapped, mediaType);
+            return sortResults(await enrichWithTmdb(wrapped, mediaType), sort);
         }
     } catch (error) {
         console.error("Popular error:", error);
