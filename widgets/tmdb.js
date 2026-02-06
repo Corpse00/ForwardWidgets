@@ -446,27 +446,48 @@ WidgetMetadata = {
           title: "Collection",
           type: "enumeration",
           enumOptions: [
-            { title: "James Bond", value: "645" },
-            { title: "Star Wars", value: "10" },
-            { title: "Star Trek", value: "151" },
-            { title: "Godzilla", value: "374509" },
-            { title: "Fast and Furious", value: "9485" },
-            { title: "Harry Potter", value: "1241" },
-            { title: "Jurassic Park", value: "328" },
-            { title: "Mission Impossible", value: "87359" },
-            { title: "Middle Earth", value: "119" },
-            { title: "Transformers", value: "8650" },
+            { title: "Alien", value: "8091" },
             { title: "Avatar", value: "87096" },
+            { title: "Back to the Future", value: "264" },
+            { title: "Batman", value: "263,120794" },
+            { title: "Bourne", value: "31562" },
+            { title: "Despicable Me", value: "86066,544669" },
+            { title: "Dune", value: "726871" },
+            { title: "Fast & Furious", value: "9485" },
+            { title: "Ghostbusters", value: "2980" },
+            { title: "Halloween", value: "91361" },
+            { title: "How to Train Your Dragon", value: "89137" },
+            { title: "Hunger Games", value: "131635" },
+            { title: "Ice Age", value: "8354" },
+            { title: "Indiana Jones", value: "84" },
+            { title: "James Bond", value: "645" },
+            { title: "John Wick", value: "404609" },
+            { title: "Jurassic Park", value: "328" },
+            { title: "Kingsman", value: "391860" },
+            { title: "Kung Fu Panda", value: "77816" },
+            { title: "Matrix", value: "2344" },
+            { title: "Men in Black", value: "86055" },
+            { title: "Middle-earth", value: "119,121938" },
+            { title: "Mission: Impossible", value: "87359" },
+            { title: "MonsterVerse", value: "535313,1539140" },
             { title: "Pirates of the Caribbean", value: "295" },
             { title: "Planet of the Apes", value: "173710" },
-            { title: "Halloween", value: "91361" },
-            { title: "John Wick", value: "404609" },
-            { title: "The Conjuring", value: "313086" },
-            { title: "Alien", value: "8091" },
+            { title: "Rocky & Creed", value: "1575,553717" },
+            { title: "Saw", value: "656" },
+            { title: "Scream", value: "2602" },
+            { title: "Shrek", value: "2150" },
+            { title: "Sonic the Hedgehog", value: "720879" },
+            { title: "Spider-Man", value: "556,125574,531241,573436" },
+            { title: "Star Trek", value: "151,115575,115570" },
+            { title: "Star Wars", value: "10" },
             { title: "Terminator", value: "528" },
-            { title: "Indiana Jones", value: "84" },
-            { title: "The Hunger Games", value: "131635" },
-            { title: "Matrix", value: "2344" },
+            { title: "The Conjuring", value: "313086" },
+            { title: "The Purge", value: "256322" },
+            { title: "Toy Story", value: "10194" },
+            { title: "Transformers", value: "8650" },
+            { title: "Twilight", value: "33514" },
+            { title: "Wizarding World", value: "1241,435259" },
+            { title: "X-Men", value: "748" },
           ],
         },
         {
@@ -671,23 +692,35 @@ async function companies(params) {
 }
 
 async function collections(params) {
-  const id = params.collection_id;
+  const collectionIds = params.collection_id.split(",");
   delete params.collection_id;
-  let items = [];
 
-  // Use keyword discovery for MCU (86311) and DCEU (8028) to get full lists
-  if (id === "86311" || id === "8028") {
-    const keywordId = id === "86311" ? "180547" : "229266";
-    const res = await Widget.tmdb.get("discover/movie", {
-      params: { ...params, with_keywords: keywordId }
-    });
-    items = res.results || [];
-  } else {
-    const res = await Widget.tmdb.get(`collection/${id}`, { params });
-    items = res.parts || [];
+  // Fetch all collections in parallel
+  const responses = await Promise.all(
+    collectionIds.map((id) =>
+      Widget.tmdb.get(`collection/${id}`, { params: { ...params } })
+    )
+  );
+
+  // Merge all parts, deduplicate by movie ID
+  const seen = new Set();
+  const allItems = [];
+  for (const res of responses) {
+    for (const item of res.parts || []) {
+      if (!seen.has(item.id)) {
+        seen.add(item.id);
+        allItems.push(item);
+      }
+    }
   }
 
-  const result = items.map((item) => ({
+  // Filter out unreleased movies
+  const today = new Date().toISOString().split("T")[0];
+  const released = allItems.filter((item) => {
+    return item.release_date && item.release_date <= today;
+  });
+
+  const result = released.map((item) => ({
     id: item.id,
     type: "tmdb",
     title: item.title,
@@ -700,11 +733,11 @@ async function collections(params) {
     genreTitle: genreTitleWith(item.genre_ids),
   }));
 
-  // Sort: New to Old
+  // Sort chronologically: Old to New (franchise viewing order)
   return result.sort((a, b) => {
     const dateA = a.releaseDate ? new Date(a.releaseDate) : new Date(0);
     const dateB = b.releaseDate ? new Date(b.releaseDate) : new Date(0);
-    return dateB - dateA;
+    return dateA - dateB;
   });
 }
 
