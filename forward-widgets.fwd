@@ -1,15 +1,15 @@
 {
   "title": "Vokdn's Widgets",
-  "description": "Premium media widgets by vokdn",
+  "description": "Premium widgets by Vokdn",
   "icon": "https://raw.githubusercontent.com/Corpse00/ForwardWidgets/master/icon.png",
   "widgets": [
     {
       "id": "vokdn.tmdb",
       "title": "TMDB",
-      "description": "Get TMDB chart data",
+      "description": "Get TMDB data",
       "requiredVersion": "0.0.1",
       "version": "1.0.0",
-      "author": "vokdn",
+      "author": "Vokdn",
       "url": "https://raw.githubusercontent.com/Corpse00/ForwardWidgets/master/widgets/tmdb.js"
     },
     {
@@ -18,7 +18,7 @@
       "description": "Access your Trakt watchlist, recommendations, lists, calendar and history",
       "requiredVersion": "0.0.1",
       "version": "1.0.0",
-      "author": "vokdn",
+      "author": "Vokdn",
       "url": "https://raw.githubusercontent.com/Corpse00/ForwardWidgets/master/widgets/trakt.js"
     }
   ]

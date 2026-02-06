@@ -3,8 +3,8 @@ WidgetMetadata = {
   title: "TMDB",
   version: "1.0.0",
   requiredVersion: "0.0.1",
-  description: "Get TMDB chart data",
-  author: "vokdn",
+  description: "Get TMDB data",
+  author: "Vokdn",
   site: "https://github.com/Corpse00/ForwardWidgets",
   modules: [
     {

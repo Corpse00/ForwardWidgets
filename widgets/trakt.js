@@ -4,7 +4,7 @@ WidgetMetadata = {
     version: "1.0.0",
     requiredVersion: "0.0.1",
     description: "Access your Trakt watchlist, recommendations, lists, calendar and history",
-    author: "vokdn",
+    author: "Vokdn",
     site: "https://github.com/Corpse00/ForwardWidgets",
 
     globalParams: [

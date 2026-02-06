@@ -5,7 +5,7 @@
 <h1 align="center">Vokdn's Widgets</h1>
 
 <p align="center">
-  <b>Premium media widgets for the Forward streaming app</b><br/>
+  <b>Premium widgets for the Forward streaming app</b><br/>
   <sub>Browse, discover, and track movies & TV shows — all from your home screen.</sub>
 </p>
 
@@ -90,7 +90,5 @@ Sync your [Trakt](https://trakt.tv/) account to access personalized watchlists, 
 ## Credits
 
 Made by **vokdn**
-
-Built on the [Forward Widget SDK](https://github.com/nicklama/forward-ern) by Johnil.
 
 ---
